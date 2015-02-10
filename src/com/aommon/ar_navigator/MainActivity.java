@@ -21,6 +21,8 @@ import android.R.bool;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PointF;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
@@ -59,7 +61,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
     
     TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin;
     ImageView imgArr;
-    Button button1;
+    Button btnSearch;
     private float currentDegree = 0f;
 	double dorm_la = 13.7294916;
 	double dorm_lng = 100.77649;
@@ -70,9 +72,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
     public static final String TAG = "InMain";
     GMapV2Direction md;
     ArrayList<LatLng> arr_pos;
-    int i = 0;
+    int i;
     boolean getInput;
     PointF a[] = new PointF[4];
+    
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +89,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		mPreview = (SurfaceView)findViewById(R.id.preview);
         mPreview.getHolder().addCallback(this);
         mPreview.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        
+        Database mHelper = new Database(this);
+    	SQLiteDatabase mDb = mHelper.getmDbHelper().getWritableDatabase();
+    	mHelper.close();
+    	mDb.close();
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -103,11 +112,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         txtEnd = (TextView) findViewById(R.id.txtEnd);
         txtFin = (TextView) findViewById(R.id.txtFin);
         imgArr = (ImageView)findViewById(R.id.imgArr);
-        button1 = (Button) findViewById(R.id.button1);
+        btnSearch = (Button) findViewById(R.id.b_search);
         md = new GMapV2Direction(this);
-        
-        
-        
         
         //GPS
         boolean result = isServicesAvailable();        
@@ -119,42 +125,62 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         	finish();
         }  
         
-	}
-	
-	public void workspace(){
-		button1.setOnClickListener(new OnClickListener() {
-			
-			@Override
+		btnSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				
-		        LatLng startPosition = new LatLng(lat, lng);
-				LatLng endPosition = new LatLng(dorm_la,dorm_lng);
-				md.request(startPosition, endPosition, GMapV2Direction.MODE_DRIVING);
-				
-				Log.e("onclick","1");
-				md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
-					
-					
-					public void onResponse(String status, Document doc, GMapV2Direction gd) {
-						// TODO Auto-generated method stub
-						int distance = gd.getTotalDistanceValue(doc);
-						Log.e(TAG,"Total Distance : "+distance);
-						int duration = gd.getTotalDurationValue(doc);
-						//Log.e(TAG,"Total Duration : "+duration);
-						textInf.setText("Distance : " + distance + " m\n"
-								+"Duration : " + duration + " sec");
-						arr_pos = gd.getDirection(doc);
-						Log.e("onclick","2");
-						
-				     // create a rotation animation (reverse turn degree degrees)
-						
-						getInput = true;
-					}
-
-				});
+				Intent intent = new Intent(getApplicationContext(),
+						SearchLocation.class);
+				//startActivity(intent);
+				startActivityForResult(intent, 999);
 			}
 		});
+	}
+	
+	protected void onActivityResult ( int requestCode, int resultCode, Intent data )
+	{
+		if(requestCode == 999)
+		{
+			if(resultCode == RESULT_OK){
+				String dName = data.getStringExtra("mydName");
+				Double dlat = data.getDoubleExtra("mydLat", lat);
+				Double dlng = data.getDoubleExtra("mydLong", lng);
+				Log.e(TAG, "Destination : " + dName + " " + dlat + "," + dlng);
+				
+				LatLng startPosition = new LatLng(lat, lng);
+				LatLng endPosition = new LatLng(dlat , dlng);
+				
+				Log.e(TAG,"start : "+startPosition);
+				Log.e(TAG,"end : "+endPosition);
+
+				Log.e(TAG, GMapV2Direction.MODE_DRIVING);
+				//try{
+				md.request(startPosition
+		                , endPosition, GMapV2Direction.MODE_DRIVING);
+				Log.e("onclick","1");
+				md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
+			        public void onResponse(String status, Document doc, GMapV2Direction gd) {
+			        	Log.e("onclick","2");
+		        		int distance = gd.getTotalDistanceValue(doc);
+		        		Log.e(TAG,"Total Distance : "+distance);
+		        		int duration = gd.getTotalDurationValue(doc);
+		        		Log.e(TAG,"Total Duration : "+duration);
+		        		textInf.setText("Distance : " + distance + " m\n"
+		        				+"Duration : " + duration + " sec");
+		                arr_pos = gd.getDirection(doc);
+		    			for(int j = 0 ; j < arr_pos.size() ; j++) {
+		                    Log.e("Position " + j, arr_pos.get(j).latitude
+		                            + ", " + arr_pos.get(j).longitude);
+		    			}
+		    			getInput = true;
+		    			i = 0;
+			        }
+				});
+
+			}
+		}
+	}
+	
+	
+	public void workspace(){
 
 		txtHeading.setText("Heading"+ (String.format("%.8f", azimuthInDegress) + "degrees"));
     	txtSoLat.setText("S_la : " + (String.format("%.8f", lat)));
@@ -171,65 +197,56 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5) && getInput){
 			con_degree = azimuthInDegress;
 			
-			Log.e("onclick","3");
-/*			for(int j = 0 ; j < arr_pos.size() ; j++) {
-                Log.e("Position " + j, arr_pos.get(j).latitude
-                        + ", " + arr_pos.get(j).longitude);
-			}
-*/			
+			Log.e("onclick","3");		
 
-				double be_lat = arr_pos.get(i).latitude;
-	        	double be_lng = arr_pos.get(i).longitude;
-	        	Log.e("be_lat",""+(String.format("%.8f", be_lat)));
-	        	Log.e("be_lng",""+(String.format("%.8f", be_lng)));
-	        	txtBetlat.setText("be_lat "+ (String.format("%.8f", be_lat)));
-	        	txtBetlng.setText("be_lng "+ (String.format("%.8f", be_lng)));
-	        	txtI.setText("I_count "+ (String.format("%d", i)));
-	        	txtEnd.setText("End "+ (String.format("%d", arr_pos.size())));
-	        	
-	        	a = nearby.nearbyLaLong(be_lat, be_lng);
-				if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
-					Log.e("i+new",""+i);
-					i++;
-	        	}else if(i==arr_pos.size()) {
-	        		txtFin.setText("DONE");
-	        	}else{
-					//Log.e("i_old",""+i);
-					angle = Azimuth.initial(lat, lng, dorm_la, dorm_lng);
-			        txtAngle.setText("angle : " + (String.format("%.8f", angle)));
-			        
-			        double true_degree = nearby.true_compass(con_degree);
-			        float rotate = (float) (angle-true_degree);
-			        if(rotate > 180){
-			        	rotate = -(360-rotate);
-			        }
+			double be_lat = arr_pos.get(i).latitude;
+        	double be_lng = arr_pos.get(i).longitude;
+        	Log.e("be_lat",""+(String.format("%.8f", be_lat)));
+        	Log.e("be_lng",""+(String.format("%.8f", be_lng)));
+        	txtBetlat.setText("be_lat "+ (String.format("%.8f", be_lat)));
+        	txtBetlng.setText("be_lng "+ (String.format("%.8f", be_lng)));
+        	txtI.setText("I_count "+ (String.format("%d", i)));
+        	txtEnd.setText("End "+ (String.format("%d", arr_pos.size())));
+        	
+       	a = nearby.nearbyLaLong(be_lat, be_lng);
+			if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
+				Log.e("i+new",""+i);
+				i++;
+        	}else if(i==arr_pos.size()) {
+        		txtFin.setText("DONE");
+        	}else{
+				//Log.e("i_old",""+i);
+				angle = Azimuth.initial(lat, lng, dorm_la, dorm_lng);
+		        txtAngle.setText("angle : " + (String.format("%.8f", angle)));
+		        
+		        double true_degree = nearby.true_compass(con_degree);
+		        float rotate = (float) (angle-true_degree);
+		        if(rotate > 180){
+		        	rotate = -(360-rotate);
+		        }
 
-			        //txtBetLat.setText("angle "+ (String.format("%.8f", rotate) + " degrees"));
-			        
-			        RotateAnimation ra = new RotateAnimation(
-			        		old_rotate,
-			        		rotate,
-			                Animation.RELATIVE_TO_SELF, 0.5f, 
-			                Animation.RELATIVE_TO_SELF, 0.5f
-			                );
-			        
-			 
-			        // how long the animation will take place
-			        ra.setDuration(200);
-			 
-			        // set the animation after the end of the reservation status
-			        ra.setFillAfter(true);
-			 
-			        // Start the animation
-			        imgArr.startAnimation(ra);
-			        old_rotate = rotate;
+		        //txtBetLat.setText("angle "+ (String.format("%.8f", rotate) + " degrees"));
+		        
+		        RotateAnimation ra = new RotateAnimation(
+		        		old_rotate,
+		        		rotate,
+		                Animation.RELATIVE_TO_SELF, 0.5f, 
+		                Animation.RELATIVE_TO_SELF, 0.5f
+		                );
+		        
+		 
+		        // how long the animation will take place
+		        ra.setDuration(200);
+		 
+		        // set the animation after the end of the reservation status
+		        ra.setFillAfter(true);
+		 
+		        // Start the animation
+		        imgArr.startAnimation(ra);
+		        old_rotate = rotate;
 
-	        	}
-	
-
-
+        	}
 		}
-		
 	}
 	
 	 public void onResume() {
@@ -321,8 +338,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
             	azimuthInDegress = (float)Math.toDegrees(degree);
             	if (azimuthInDegress < 0.0f) {
             		azimuthInDegress += 360.0f;
-            	}
-            	
+            	}           	
             }
         }
         workspace();
