@@ -1512,14 +1512,14 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f08002a;
         public static final int action_menu_presenter=0x7f08002b;
         public static final int action_mode_close_button=0x7f080038;
-        public static final int action_settings=0x7f080060;
+        public static final int action_settings=0x7f08005f;
         public static final int activity_chooser_view_content=0x7f080039;
         public static final int adjust_height=0x7f080002;
         public static final int adjust_width=0x7f080001;
         public static final int always=0x7f080020;
-        public static final int b_search=0x7f08005e;
         public static final int beginning=0x7f080025;
         public static final int book_now=0x7f080012;
+        public static final int button1=0x7f08005e;
         public static final int buyButton=0x7f08000c;
         public static final int buy_now=0x7f080011;
         public static final int buy_with_google=0x7f080010;
@@ -1544,7 +1544,6 @@ containing a value of this type.
         public static final int ifRoom=0x7f08001f;
         public static final int image=0x7f08003b;
         public static final int imgArr=0x7f08005d;
-        public static final int l_name=0x7f08005f;
         public static final int listMode=0x7f080016;
         public static final int list_item=0x7f08003d;
         public static final int match_parent=0x7f08000e;
@@ -1651,8 +1650,7 @@ containing a value of this type.
         public static final int abc_search_view=0x7f030016;
         public static final int abc_simple_decor=0x7f030017;
         public static final int activity_main=0x7f030018;
-        public static final int searchview=0x7f030019;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001a;
+        public static final int support_simple_spinner_dropdown_item=0x7f030019;
     }
     public static final class menu {
         public static final int main=0x7f0d0000;
