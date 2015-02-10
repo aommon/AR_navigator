@@ -66,16 +66,16 @@ public class nearby {
         return t_de;
 	}
 	
-	public static PointF[] nearbyLaLong (double s_la, double s_long){
+	public static PointF[] nearbyLaLong (double s_la, double s_long,int distance){
 		//nearby
         PointF center = new PointF((float)s_la, (float)s_long);
         final double mult = 1.1; // mult = 1.1; is more reliable
         //double distance = 50;
         
-        PointF p1 = nearby.calculateDerivedPosition(center, mult * 7, 0); //right
-        PointF p2 = nearby.calculateDerivedPosition(center, mult * 7, 90); //forward
-        PointF p3 = nearby.calculateDerivedPosition(center, mult * 7, 180);//left
-        PointF p4 = nearby.calculateDerivedPosition(center, mult * 7, 270);//back
+        PointF p1 = nearby.calculateDerivedPosition(center, mult * distance, 0); //right
+        PointF p2 = nearby.calculateDerivedPosition(center, mult * distance, 90); //forward
+        PointF p3 = nearby.calculateDerivedPosition(center, mult * distance, 180);//left
+        PointF p4 = nearby.calculateDerivedPosition(center, mult * distance, 270);//back
         
         PointF p[] = new PointF[4];
         p[0]=p1;
