@@ -146,12 +146,13 @@
         android:text="Search Destination" 
         android:drawableLeft="@drawable/icon_search2"/>
     
-    <Button
+    <ImageView
         android:id="@+id/b_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/b_search"
-        android:text="Seddd" />
+        android:layout_marginBottom="2dp"
+        android:src="@drawable/icon_walking2" />
 
 </RelativeLayout>
