@@ -1,21 +1,9 @@
 package com.aommon.ar_navigator;
 
 public class Azimuth {
-	public static double calAngle(double s_lat, double s_long, double d_lat, double d_long){
-		
+	public static double calAngle(double s_lat, double s_long, double d_lat, double d_long){		
 		s_lat = Math.toRadians(s_lat); 
-		
-		
 		double a = Math.atan(Math.abs((d_long-s_long)/(d_lat-s_lat)))*(180/Math.PI);
-		/*if ( (d_lat>s_lat) && (d_long<s_long) ) {
-			return 360-a; //NW
-		} else if ( (d_lat>s_lat) && (d_long<s_long) ) {
-			return a; //NE
-		}else if ( (d_lat<s_lat) && (d_long<s_long) ) {
-			return a+180; //SW
-		}else {
-			return 180-a; //SE
-		}*/
 		return a;
 	}
 	

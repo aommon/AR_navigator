@@ -121,24 +121,37 @@
         android:layout_alignBottom="@+id/txtSoLng"
         android:layout_centerHorizontal="true"
         android:text="" />
+    
+    <TextView
+        android:id="@+id/txtCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txtFin"
+        android:layout_centerHorizontal="true"
+        android:text="Normal" />
 
     <ImageView
         android:id="@+id/imgArr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/txtDesLng"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/arrow" />
+        android:layout_centerHorizontal="true"/>
 
     <Button
         android:id="@+id/b_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/imgArr"
-        android:layout_alignTop="@+id/txtSoLat"
-        android:layout_marginRight="32dp"
-        android:text="Search" />
-
-
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Search Destination" 
+        android:drawableLeft="@drawable/icon_search2"/>
+    
+    <Button
+        android:id="@+id/b_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/b_search"
+        android:text="Seddd" />
 
 </RelativeLayout>

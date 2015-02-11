@@ -59,24 +59,22 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
     float[] mGravity;
     float[] mGeomagnetic;
     
-    TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin;
+    TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin,txtCheck;
     ImageView imgArr;
     Button btnSearch;
     private float currentDegree = 0f;
-	double dlat,dlng;
     
     //Map
     LocationClient mLocationClient;
-    double lat,lng,angle;
+    double lat,lng,angle,dlat,dlng;
     public static final String TAG = "InMain";
     GMapV2Direction md;
     ArrayList<LatLng> arr_pos;
     int i;
     boolean getInput;
     PointF a[] = new PointF[4];
-    PointF n_target[] = new PointF[4];
-    
-
+    PointF at_target[] = new PointF[4];
+    PointF near_target[] = new PointF[4];
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +109,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         txtI = (TextView) findViewById(R.id.txtI);
         txtEnd = (TextView) findViewById(R.id.txtEnd);
         txtFin = (TextView) findViewById(R.id.txtFin);
+        txtCheck = (TextView) findViewById(R.id.txtCheck);
         imgArr = (ImageView)findViewById(R.id.imgArr);
         btnSearch = (Button) findViewById(R.id.b_search);
         md = new GMapV2Direction(this);
@@ -125,12 +124,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         	finish();
         }  
         
+        
 		btnSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(),
 						SearchLocation.class);
 				//startActivity(intent);
 				startActivityForResult(intent, 999);
+				txtCheck.setText("Click");
 			}
 		});
 	}
@@ -140,6 +141,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		if(requestCode == 999)
 		{
 			if(resultCode == RESULT_OK){
+				txtCheck.setText("Send Data to Google");
 				String dName = data.getStringExtra("mydName");
 				dlat = data.getDoubleExtra("mydLat", lat);
 				dlng = data.getDoubleExtra("mydLong", lng);
@@ -170,8 +172,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		                    Log.e("Position " + j, arr_pos.get(j).latitude
 		                            + ", " + arr_pos.get(j).longitude);
 		    			}
+		    			txtCheck.setText("Recieve Data from Google");
 		    			getInput = true;
 		    			i = 0;
+		    			imgArr.setImageResource(R.drawable.arrow_red);
 			        }
 				});
 			}
@@ -197,13 +201,19 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 			
 			Log.e("onclick","3");		
 
-			n_target = nearby.nearbyLaLong(dlat, dlng,7);
-			if(lat > n_target[2].x && lat < n_target[0].x && lng < n_target[1].y && lng > n_target[3].y ){
-				txtFin.setText("DONE");
-				getInput = false;
-				
-				
-			}else{
+			near_target = nearby.nearbyLaLong(dlat, dlng, 10);
+			if(lat > near_target[2].x && lat < near_target[0].x && lng < near_target[1].y && lng > near_target[3].y ){
+				double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
+				old_rotate = Navigator.Rotate_arrow(con_degree, t_angle, old_rotate, imgArr);
+				txtCheck.setText("Near Target");
+				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
+					txtFin.setText("DONE");
+					getInput = false;
+					txtCheck.setText("@Target DONE!!");		
+					imgArr.setImageBitmap(null);
+				}
+			} else {
+				at_target = nearby.nearbyLaLong(dlat, dlng,7);
 				double be_lat = arr_pos.get(i).latitude;
 	        	double be_lng = arr_pos.get(i).longitude;
 	        	Log.e("be_lat",""+(String.format("%.8f", be_lat)));
@@ -217,36 +227,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 				if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
 					Log.e("i+new",""+i);
 					i++;
+					txtCheck.setText("I++");
 	         	}else{
-					//Log.e("i_old",""+i);
-					angle = Azimuth.initial(lat, lng, be_lat, be_lng);
-			        txtAngle.setText("angle : " + (String.format("%.8f", angle)));
-			        
-			        double true_degree = nearby.true_compass(con_degree);
-			        float rotate = (float) (angle-true_degree);
-			        if(rotate > 180){
-			        	rotate = -(360-rotate);
-			        }
-
-			        //txtBetLat.setText("angle "+ (String.format("%.8f", rotate) + " degrees"));
-			        
-			        RotateAnimation ra = new RotateAnimation(
-			        		old_rotate,
-			        		rotate,
-			                Animation.RELATIVE_TO_SELF, 0.5f, 
-			                Animation.RELATIVE_TO_SELF, 0.5f
-			                );
-			        
-			 
-			        // how long the animation will take place
-			        ra.setDuration(200);
-			 
-			        // set the animation after the end of the reservation status
-			        ra.setFillAfter(true);
-			 
-			        // Start the animation
-			        imgArr.startAnimation(ra);
-			        old_rotate = rotate;
+	        		//Log.e("i_old",""+i);
+	        		angle = Azimuth.initial(lat, lng, be_lat, be_lng);
+	                txtAngle.setText("angle : " + (String.format("%.8f", angle)));
+	                old_rotate = Navigator.Rotate_arrow(con_degree, angle, old_rotate, imgArr);
+			        txtCheck.setText("Rotate Arrow");
 	        	}
 			}
 		}
@@ -317,8 +304,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
     
     @Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
     
     @Override
