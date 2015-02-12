@@ -89,6 +89,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         mPreview.getHolder().addCallback(this);
         mPreview.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         
+        // click autofocus
+        mPreview.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mCamera.autoFocus(MainActivity.this);
+            }
+        });
+        
         Database mHelper = new Database(this);
     	SQLiteDatabase mDb = mHelper.getmDbHelper().getWritableDatabase();
     	mHelper.close();
@@ -98,41 +105,23 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         
-/*        txtHeading = (TextView) findViewById(R.id.txtHeading);
-        textInf = (TextView) findViewById(R.id.textInf);
-        txtSoLat = (TextView) findViewById(R.id.txtSoLat);
-        txtSoLng = (TextView) findViewById(R.id.txtSoLng);
-        txtBetlat = (TextView) findViewById(R.id.txtBetLat);
-        txtBetlng = (TextView) findViewById(R.id.txtBetLng);
-        txtDesLat = (TextView) findViewById(R.id.txtDesLat);
-        txtDesLng = (TextView) findViewById(R.id.txtDesLng);
-        txtAngle = (TextView) findViewById(R.id.txtAngle);
-        txtI = (TextView) findViewById(R.id.txtI);
-        txtEnd = (TextView) findViewById(R.id.txtEnd);
-        txtFin = (TextView) findViewById(R.id.txtFin);*/
         txtCheck = (TextView) findViewById(R.id.txtCheck);
         imgArr = (ImageView)findViewById(R.id.imgArr);
         btnSearch = (Button) findViewById(R.id.b_search);
         md = new GMapV2Direction(this);
         
-        //GPS
         boolean result = isServicesAvailable();        
         if(result) {
-            // �����ͧ�� Google Play Services
         	mLocationClient = new LocationClient(this, mCallback, mListener);
         } else {
-            // �����ͧ����� Google Play Services �Դ�������
         	finish();
         }  
-        
         
 		btnSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(),
 						SearchLocation.class);
-				//startActivity(intent);
 				startActivityForResult(intent, 999);
-				//txtCheck.setText("Click");
 			}
 		});
 	}
@@ -142,7 +131,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		if(requestCode == 999)
 		{
 			if(resultCode == RESULT_OK){
-				//txtCheck.setText("Send Data to Google");
 				String dName = data.getStringExtra("mydName");
 				dlat = data.getDoubleExtra("mydLat", lat);
 				dlng = data.getDoubleExtra("mydLong", lng);
@@ -172,11 +160,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		                    Log.e("Position " + j, arr_pos.get(j).latitude
 		                            + ", " + arr_pos.get(j).longitude);
 		    			}
-		    			//txtCheck.setText("Recieve Data from Google");
 		    			getInput = true;
 		    			i = 0;
-		    			imgArr.setImageResource(R.drawable.arrow_red);
-		    			//txtCheck.setText("");	
+		    			imgArr.setImageResource(R.drawable.arrow_red);	
 			        }
 				});
 			}
@@ -184,19 +170,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 	}
 
 	public void workspace(){
-
-		/*txtHeading.setText("Heading"+ (String.format("%.8f", azimuthInDegress) + "degrees"));
-    	txtSoLat.setText("S_la : " + (String.format("%.8f", lat)));
-		txtSoLng.setText("S_long : " + (String.format("%.8f", lng)));
-		txtDesLat.setText("D_la : " + (String.format("%.8f", dlat)));
-		txtDesLng.setText("D_long : " + (String.format("%.8f", dlng)));*/
-		
-		//Log.e(TAG,"start : "+startPosition);
-		//Log.e(TAG,"end : "+endPosition);
-		
-		//Log.e(TAG, GMapV2Direction.MODE_DRIVING);
-		
-		//try{
 		if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5) && getInput){
 			con_degree = azimuthInDegress;
 			
@@ -206,39 +179,27 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 			if(lat > near_target[2].x && lat < near_target[0].x && lng < near_target[1].y && lng > near_target[3].y ){
 				double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
 				old_rotate = Navigator.Rotate_arrow(con_degree, t_angle, old_rotate, imgArr);
-				//txtCheck.setText("Near Target");
 				at_target = nearby.nearbyLaLong(dlat, dlng,7);
 				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
-					//txtFin.setText("DONE");
-					getInput = false;
-					//txtCheck.setText("Reached Destination ^_^");	
+					getInput = false;	
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
 					txtCheck.setText("");
 					imgArr.setImageBitmap(null);
 				}
 			} else {
 				double distance = Harversine.haversine(dlat, dlng, lat, lng);
-				//txtCheck.setText("Total Distance : " +  String.format("%.2f", distance)+" m." );
 				double be_lat = arr_pos.get(i).latitude;
 	        	double be_lng = arr_pos.get(i).longitude;
 	        	Log.e("be_lat",""+(String.format("%.8f", be_lat)));
 	        	Log.e("be_lng",""+(String.format("%.8f", be_lng)));
-	        	/*txtBetlat.setText("be_lat "+ (String.format("%.8f", be_lat)));
-	        	txtBetlng.setText("be_lng "+ (String.format("%.8f", be_lng)));
-	        	txtI.setText("I_count "+ (String.format("%d", i)));
-	        	txtEnd.setText("End "+ (String.format("%d", arr_pos.size())));*/
 	        	
 	        	a = nearby.nearbyLaLong(be_lat, be_lng,7);
 				if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
 					Log.e("i+new",""+i);
 					i++;
-					//txtCheck.setText("I++");
 	         	}else{
-	        		//Log.e("i_old",""+i);
 	        		angle = Azimuth.initial(lat, lng, be_lat, be_lng);
-	                //txtAngle.setText("angle : " + (String.format("%.8f", angle)));
 	                old_rotate = Navigator.Rotate_arrow(con_degree, angle, old_rotate, imgArr);
-			       // txtCheck.setText("Rotate Arrow");
 	        	}
 			}
 		}
@@ -328,7 +289,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
             	float orientation[] = new float[3];
             	SensorManager.getOrientation(R, orientation);
             	degree = orientation[0]; // orientation contains: azimut, pitch and roll
-            	//Log.e("azi", "" + degree);
             	azimuthInDegress = (float)Math.toDegrees(degree);
             	if (azimuthInDegress < 0.0f) {
             		azimuthInDegress += 360.0f;
@@ -341,7 +301,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
   //GPS
     private ConnectionCallbacks mCallback = new ConnectionCallbacks() {
         public void onConnected(Bundle bundle) {
-            // �������͡Ѻ Google Play Services ��
         	Toast.makeText(MainActivity.this, "Services connected", Toast.LENGTH_SHORT).show();
 
             LocationRequest mRequest = new LocationRequest()
@@ -352,7 +311,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         }
 
         public void onDisconnected() {
-            // ��ش�������͡Ѻ Google Play Services
         	Toast.makeText(MainActivity.this, "Services disconnected", Toast.LENGTH_SHORT).show();
         }
     };
@@ -370,13 +328,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
-
         	LatLng coordinate = new LatLng(location.getLatitude(),location.getLongitude());
         	lat = location.getLatitude();
         	lng = location.getLongitude();
-        	workspace();
-         
+        	workspace();         
 		}       
-    };
-	    
+    };    
 }
