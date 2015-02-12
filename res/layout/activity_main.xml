@@ -52,7 +52,7 @@
         android:layout_below="@+id/txtSoLng"
         android:layout_marginLeft="33dp"
         android:layout_marginTop="10dp"
-        android:text="eee" />
+        android:text="" />
     
     <TextView
         android:id="@+id/txtBetLng"
@@ -62,7 +62,7 @@
         android:layout_below="@+id/txtBetLat"
         android:layout_marginLeft="33dp"
         android:layout_marginTop="10dp"
-        android:text="qqqq" />
+        android:text="" />
     
     <TextView
         android:id="@+id/txtDesLat"
@@ -92,7 +92,7 @@
         android:layout_below="@+id/txtDesLng"
         android:layout_marginLeft="33dp"
         android:layout_marginTop="10dp"
-        android:text="ll" />
+        android:text="" />
     
     <TextView
         android:id="@+id/txtI"
@@ -102,7 +102,7 @@
         android:layout_below="@+id/txtAngle"
         android:layout_marginLeft="33dp"
         android:layout_marginTop="10dp"
-        android:text="ll" />
+        android:text="" />
     
      <TextView
         android:id="@+id/txtEnd"
@@ -112,7 +112,7 @@
         android:layout_below="@+id/txtI"
         android:layout_marginLeft="33dp"
         android:layout_marginTop="10dp"
-        android:text="ll" />
+        android:text="" />
      
     <TextView
         android:id="@+id/txtFin"
@@ -121,14 +121,6 @@
         android:layout_alignBottom="@+id/txtSoLng"
         android:layout_centerHorizontal="true"
         android:text="" />
-    
-    <TextView
-        android:id="@+id/txtCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/txtFin"
-        android:layout_centerHorizontal="true"
-        android:text="Normal" />
 
     <ImageView
         android:id="@+id/imgArr"
@@ -146,13 +138,23 @@
         android:text="Search Destination" 
         android:drawableLeft="@drawable/icon_search2"/>
     
-    <ImageView
+    <!-- ImageView
         android:id="@+id/b_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/b_search"
         android:layout_marginBottom="2dp"
-        android:src="@drawable/icon_walking2" />
+        android:src="@drawable/icon_walking2" /-->
+
+    <TextView
+        android:id="@+id/txtCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/b_search"
+        android:layout_marginRight="10dp"
+        android:text=""
+        android:textSize="20dp" />
 
 </RelativeLayout>
