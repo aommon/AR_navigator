@@ -157,4 +157,21 @@
         android:text=""
         android:textSize="20dp" />
 
+    <!-- ToggleButton
+        android:id="@+id/typeForNavi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/b_search" 
+        style="@style/toggleButton"
+        android:background="@drawable/ic_toggle_bg"/-->
+
+    <ImageButton
+        android:id="@+id/btn_imageType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/b_search"
+        android:src="@drawable/icon_walking2" />
+
 </RelativeLayout>

@@ -44,6 +44,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,6 +64,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
     TextView txtCheck;
     ImageView imgArr;
     Button btnSearch;
+    ImageButton btn_imageType;
     private float currentDegree = 0f;
     
     //Map
@@ -71,8 +73,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
     public static final String TAG = "InMain";
     GMapV2Direction md;
     ArrayList<LatLng> arr_pos;
-    int i;
-    boolean getInput;
+    int i,c=0;
+    boolean getInput,click,click_done;
     PointF a[] = new PointF[4];
     PointF at_target[] = new PointF[4];
     PointF near_target[] = new PointF[4];
@@ -108,6 +110,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         txtCheck = (TextView) findViewById(R.id.txtCheck);
         imgArr = (ImageView)findViewById(R.id.imgArr);
         btnSearch = (Button) findViewById(R.id.b_search);
+        btn_imageType = (ImageButton)  findViewById(R.id.btn_imageType);
         md = new GMapV2Direction(this);
         
         boolean result = isServicesAvailable();        
@@ -117,20 +120,33 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         	finish();
         }  
         
+        
+        
 		btnSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(),
 						SearchLocation.class);
 				startActivityForResult(intent, 999);
+				click =true;
 			}
 		});
+		
+
+		
+
+		
+		
 	}
 	
 	protected void onActivityResult ( int requestCode, int resultCode, Intent data )
 	{
 		if(requestCode == 999)
 		{
-			if(resultCode == RESULT_OK){
+			
+			if(resultCode == RESULT_OK ){
+
+				
+				
 				String dName = data.getStringExtra("mydName");
 				dlat = data.getDoubleExtra("mydLat", lat);
 				dlng = data.getDoubleExtra("mydLong", lng);
@@ -143,33 +159,50 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 				Log.e(TAG,"end : "+endPosition);
 
 				Log.e(TAG, GMapV2Direction.MODE_DRIVING);
-				//try{
-				md.request(startPosition
-		                , endPosition, GMapV2Direction.MODE_DRIVING);
-				Log.e("onclick","1");
-				md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
-			        public void onResponse(String status, Document doc, GMapV2Direction gd) {
-			        	Log.e("onclick","2");
-		        		int distance = gd.getTotalDistanceValue(doc);
-		        		Log.e(TAG,"Total Distance : "+distance);
-		        		int duration = gd.getTotalDurationValue(doc);
-		        		Log.e(TAG,"Total Duration : "+duration);
-		        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
-		                arr_pos = gd.getDirection(doc);
-		    			for(int j = 0 ; j < arr_pos.size() ; j++) {
-		                    Log.e("Position " + j, arr_pos.get(j).latitude
-		                            + ", " + arr_pos.get(j).longitude);
-		    			}
-		    			getInput = true;
-		    			i = 0;
-		    			imgArr.setImageResource(R.drawable.arrow_red);	
-			        }
-				});
-			}
+				
+					
+					
+					md.request(startPosition
+			                , endPosition, GMapV2Direction.MODE_DRIVING);
+					Log.e("onclick","1");
+					md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
+				        public void onResponse(String status, Document doc, GMapV2Direction gd) {
+				        	Log.e("onclick","2");
+			        		int distance = gd.getTotalDistanceValue(doc);
+			        		Log.e(TAG,"Total Distance : "+distance);
+			        		int duration = gd.getTotalDurationValue(doc);
+			        		Log.e(TAG,"Total Duration : "+duration);
+			        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+			                arr_pos = gd.getDirection(doc);
+			    			for(int j = 0 ; j < arr_pos.size() ; j++) {
+			                    Log.e("Position " + j, arr_pos.get(j).latitude
+			                            + ", " + arr_pos.get(j).longitude);
+			    			}
+			    			getInput = true;
+			    			i = 0;
+			    			imgArr.setImageResource(R.drawable.arrow_red);	
+				        }
+					});
+				}
 		}
 	}
 
 	public void workspace(){
+		if(click){
+			btn_imageType.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					if(c%2 == 1){
+						btn_imageType.setImageResource(R.drawable.icon_driving);
+					}else{
+						btn_imageType.setImageResource(R.drawable.icon_walking2);
+					}
+					c++;
+					//click_done=true;
+				}
+			});
+		}
+
+		
 		if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5) && getInput){
 			con_degree = azimuthInDegress;
 			
@@ -185,6 +218,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
 					txtCheck.setText("");
 					imgArr.setImageBitmap(null);
+					click = true;
 				}
 			} else {
 				double distance = Harversine.haversine(dlat, dlng, lat, lng);
@@ -211,6 +245,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         mCamera = Camera.open();
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI); 
+
+
     }
     
     public void onPause() {

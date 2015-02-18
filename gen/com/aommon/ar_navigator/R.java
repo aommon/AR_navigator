@@ -1499,15 +1499,18 @@ containing a value of this type.
         public static final int ic_plusone_small_off_client=0x7f020076;
         public static final int ic_plusone_standard_off_client=0x7f020077;
         public static final int ic_plusone_tall_off_client=0x7f020078;
-        public static final int icon_search2=0x7f020079;
-        public static final int icon_walking=0x7f02007a;
-        public static final int icon_walking2=0x7f02007b;
-        public static final int logov1=0x7f02007c;
-        public static final int powered_by_google_dark=0x7f02007d;
-        public static final int powered_by_google_light=0x7f02007e;
-        public static final int search=0x7f02007f;
-        public static final int t1logo=0x7f020080;
-        public static final int t2logo=0x7f020081;
+        public static final int ic_toggle=0x7f020079;
+        public static final int ic_toggle_bg=0x7f02007a;
+        public static final int icon_driving=0x7f02007b;
+        public static final int icon_search2=0x7f02007c;
+        public static final int icon_walking2=0x7f02007d;
+        public static final int icon_wd=0x7f02007e;
+        public static final int logov1=0x7f02007f;
+        public static final int powered_by_google_dark=0x7f020080;
+        public static final int powered_by_google_light=0x7f020081;
+        public static final int search=0x7f020082;
+        public static final int t1logo=0x7f020083;
+        public static final int t2logo=0x7f020084;
     }
     public static final class id {
         public static final int action_bar=0x7f080030;
@@ -1521,7 +1524,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f08002a;
         public static final int action_menu_presenter=0x7f08002b;
         public static final int action_mode_close_button=0x7f080038;
-        public static final int action_settings=0x7f080061;
+        public static final int action_settings=0x7f080062;
         public static final int activity_chooser_view_content=0x7f080039;
         public static final int adjust_height=0x7f080002;
         public static final int adjust_width=0x7f080001;
@@ -1529,6 +1532,7 @@ containing a value of this type.
         public static final int b_search=0x7f08005e;
         public static final int beginning=0x7f080025;
         public static final int book_now=0x7f080012;
+        public static final int btn_imageType=0x7f080060;
         public static final int buyButton=0x7f08000c;
         public static final int buy_now=0x7f080011;
         public static final int buy_with_google=0x7f080010;
@@ -1553,7 +1557,7 @@ containing a value of this type.
         public static final int ifRoom=0x7f08001f;
         public static final int image=0x7f08003b;
         public static final int imgArr=0x7f08005d;
-        public static final int l_name=0x7f080060;
+        public static final int l_name=0x7f080061;
         public static final int listMode=0x7f080016;
         public static final int list_item=0x7f08003d;
         public static final int match_parent=0x7f08000e;
@@ -2063,6 +2067,8 @@ containing a value of this type.
         public static final int Widget_AppCompat_ProgressBar=0x7f06000f;
         public static final int Widget_AppCompat_ProgressBar_Horizontal=0x7f06000e;
         public static final int Widget_AppCompat_Spinner_DropDown_ActionBar=0x7f060027;
+        public static final int Widget_Button_Toggle=0x7f060092;
+        public static final int toggleButton=0x7f060093;
     }
     public static final class styleable {
         /**  ============================================ 
