@@ -127,7 +127,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 				Intent intent = new Intent(getApplicationContext(),
 						SearchLocation.class);
 				startActivityForResult(intent, 999);
-				click =true;
 			}
 		});
 		
@@ -144,9 +143,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		{
 			
 			if(resultCode == RESULT_OK ){
-
-				
-				
 				String dName = data.getStringExtra("mydName");
 				dlat = data.getDoubleExtra("mydLat", lat);
 				dlng = data.getDoubleExtra("mydLong", lng);
@@ -154,36 +150,32 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 				btnSearch.setText(dName);
 				LatLng startPosition = new LatLng(lat, lng);
 				LatLng endPosition = new LatLng(dlat , dlng);
-				
 				Log.e(TAG,"start : "+startPosition);
 				Log.e(TAG,"end : "+endPosition);
-
 				Log.e(TAG, GMapV2Direction.MODE_DRIVING);
-				
-					
-					
-					md.request(startPosition
-			                , endPosition, GMapV2Direction.MODE_DRIVING);
-					Log.e("onclick","1");
-					md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
-				        public void onResponse(String status, Document doc, GMapV2Direction gd) {
-				        	Log.e("onclick","2");
-			        		int distance = gd.getTotalDistanceValue(doc);
-			        		Log.e(TAG,"Total Distance : "+distance);
-			        		int duration = gd.getTotalDurationValue(doc);
-			        		Log.e(TAG,"Total Duration : "+duration);
-			        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
-			                arr_pos = gd.getDirection(doc);
-			    			for(int j = 0 ; j < arr_pos.size() ; j++) {
-			                    Log.e("Position " + j, arr_pos.get(j).latitude
-			                            + ", " + arr_pos.get(j).longitude);
-			    			}
-			    			getInput = true;
-			    			i = 0;
-			    			imgArr.setImageResource(R.drawable.arrow_red);	
-				        }
-					});
-				}
+				md.request(startPosition
+		                , endPosition, GMapV2Direction.MODE_DRIVING);
+				Log.e("onclick","1");
+				md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
+			        public void onResponse(String status, Document doc, GMapV2Direction gd) {
+			        	Log.e("onclick","2");
+		        		int distance = gd.getTotalDistanceValue(doc);
+		        		Log.e(TAG,"Total Distance : "+distance);
+		        		int duration = gd.getTotalDurationValue(doc);
+		        		Log.e(TAG,"Total Duration : "+duration);
+		        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+		                arr_pos = gd.getDirection(doc);
+		    			for(int j = 0 ; j < arr_pos.size() ; j++) {
+		                    Log.e("Position " + j, arr_pos.get(j).latitude
+		                            + ", " + arr_pos.get(j).longitude);
+		    			}
+		    			getInput = true;
+		    			i = 0;
+		    			imgArr.setImageResource(R.drawable.arrow_red);	
+			        }
+				});
+				click =true;
+			}
 		}
 	}
 
@@ -203,7 +195,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 		}
 
 		
-		if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5) && getInput){
+		//if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5) && getInput){
+		if(getInput){
 			con_degree = azimuthInDegress;
 			
 			Log.e("onclick","3");		
@@ -337,8 +330,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
   //GPS
     private ConnectionCallbacks mCallback = new ConnectionCallbacks() {
         public void onConnected(Bundle bundle) {
-        	Toast.makeText(MainActivity.this, "Services connected", Toast.LENGTH_SHORT).show();
-
+        	//Toast.makeText(MainActivity.this, "Services connected", Toast.LENGTH_SHORT).show();
             LocationRequest mRequest = new LocationRequest()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(5000).setFastestInterval(1000);

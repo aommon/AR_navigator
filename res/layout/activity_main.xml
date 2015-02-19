@@ -126,7 +126,8 @@
         android:id="@+id/imgArr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/txtDesLng"
+        android:layout_alignTop="@+id/txtAngle"
+        android:alpha="0.7"
         android:layout_centerHorizontal="true"/>
 
     <Button
@@ -136,6 +137,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:text="Search Destination" 
+        android:textColor="#FFBF00"
         android:drawableLeft="@drawable/icon_search2"/>
     
     <!-- ImageView
@@ -154,6 +156,7 @@
         android:layout_alignParentRight="true"
         android:layout_above="@+id/b_search"
         android:layout_marginRight="10dp"
+        android:textColor="#DF3A01"
         android:text=""
         android:textSize="20dp" />
 
@@ -170,6 +173,7 @@
         android:id="@+id/btn_imageType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+      
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/b_search"
         android:src="@drawable/icon_walking2" />
