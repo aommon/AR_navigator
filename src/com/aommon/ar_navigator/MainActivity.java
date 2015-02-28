@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
+import com.aommon.ar_navigator.Database.DatabaseHelper;
 import com.aommon.ar_navigator.GMapV2Direction.OnDirectionResponseListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -18,10 +19,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.R.bool;
+import android.R.string;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PointF;
 import android.hardware.Camera;
@@ -43,13 +46,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.webkit.WebChromeClient.CustomViewCallback;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements SurfaceHolder.Callback, SensorEventListener, AutoFocusCallback {
+public class MainActivity<CustomView> extends Activity implements SurfaceHolder.Callback, SensorEventListener, AutoFocusCallback {
 
 	Camera mCamera;
     SurfaceView mPreview;
@@ -78,6 +82,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
     PointF a[] = new PointF[4];
     PointF at_target[] = new PointF[4];
     PointF near_target[] = new PointF[4];
+    CustomView mCustomview;
+    
+    //canvas
+    DrawSurfaceView mDrawView;
+    public static ArrayList<Point> props = new ArrayList<Point>();
+    
+    //Database
+    SQLiteDatabase mDb;  
+    Database mHelper;  
+    Cursor mCursor_near;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,11 +112,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
             }
         });
         
-        Database mHelper = new Database(this);
-    	SQLiteDatabase mDb = mHelper.getmDbHelper().getWritableDatabase();
-    	mHelper.close();
-    	mDb.close();
-
+        mHelper = new Database(this);
+    	mDb = mHelper.getmDbHelper().getWritableDatabase();
+    	
+    	
+    	
+    	
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -111,6 +126,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         imgArr = (ImageView)findViewById(R.id.imgArr);
         btnSearch = (Button) findViewById(R.id.b_search);
         btn_imageType = (ImageButton)  findViewById(R.id.btn_imageType);
+        mDrawView = (DrawSurfaceView) findViewById(R.id.view);
+        
         md = new GMapV2Direction(this);
         
         boolean result = isServicesAvailable();        
@@ -120,8 +137,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
         	finish();
         }  
         
-        
-        
 		btnSearch.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(),
@@ -129,11 +144,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 				startActivityForResult(intent, 999);
 			}
 		});
-		
-
-		
-
-		
 		
 	}
 	
@@ -193,18 +203,46 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 				}
 			});
 		}
+		if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5)){
+			con_degree = azimuthInDegress;
+	    	//send all to canvas
+			if (lat != 0 && lng != 0){
+				Log.e("check", "2");
+//				a = nearby.nearbyLaLong(lat, lng, 50);
+				mCursor_near = mDb.rawQuery("SELECT  " +  Database.COL_NAME  + "," + Database.COL_LATITUDE + "," + 
+	        		Database.COL_LONGITUDE  + " FROM " + Database.TABLE_NAME , null);
+       
+				Log.e("check2", String.format("%d", mCursor_near.getCount()));
+			   	 mCursor_near.moveToFirst();
+		        if(mCursor_near.moveToFirst()){
+		        	props.clear();
+		        	Log.e("check2", String.format("%d", mCursor_near.getCount()));
+		        	do{	        	
+		        		double latitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LATITUDE));
+		        		double longitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LONGITUDE));
+		        		String name = mCursor_near.getString(mCursor_near.getColumnIndex(Database.COL_NAME));	        		
+		        		//Log.e("check3", String.format("%.8f", longitude));
+		        		Log.e("check4", name);
+			        	props.add(new Point(latitude, longitude, name));
+		        	} while (mCursor_near.moveToNext());
+		        	Log.e("end", "end");
+		        	 mDrawView.getnear_lacation(props);
+		        	//Log.e("invalidate", "call-mm");
+		        	mDrawView.invalidate();
+		        }
+			}
 
-		
+		}
+
 		//if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5) && getInput){
 		if(getInput){
-			con_degree = azimuthInDegress;
 			
 			Log.e("onclick","3");		
 
 			near_target = nearby.nearbyLaLong(dlat, dlng, 10);
 			if(lat > near_target[2].x && lat < near_target[0].x && lng < near_target[1].y && lng > near_target[3].y ){
 				double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
-				old_rotate = Navigator.Rotate_arrow(con_degree, t_angle, old_rotate, imgArr);
+				old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
 				at_target = nearby.nearbyLaLong(dlat, dlng,7);
 				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
 					getInput = false;	
@@ -226,10 +264,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 					i++;
 	         	}else{
 	        		angle = Azimuth.initial(lat, lng, be_lat, be_lng);
-	                old_rotate = Navigator.Rotate_arrow(con_degree, angle, old_rotate, imgArr);
+	                old_rotate = Navigator.Rotate_arrow(azimuthInDegress, angle, old_rotate, imgArr);
 	        	}
 			}
 		}
+		//Log.e("invalidate", "call-workspace");
+		mDrawView.invalidate();
 	}
 	
 	 public void onResume() {
@@ -324,6 +364,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
             	}           	
             }
         }
+        //canvas
+        float true_deg = nearby.true_compass(azimuthInDegress);
+        
+		if (mDrawView != null) {
+			mDrawView.setOffset(true_deg);
+			//Log.e("invalidate", "call-sensor");
+			mDrawView.invalidate();
+		}
         workspace();
 	}
     
@@ -356,9 +404,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Se
 
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
-        	LatLng coordinate = new LatLng(location.getLatitude(),location.getLongitude());
+        	//LatLng coordinate = new LatLng(location.getLatitude(),location.getLongitude());
         	lat = location.getLatitude();
         	lng = location.getLongitude();
+        	mDrawView.setMyLocation(location.getLatitude(), location.getLongitude());
+        	//Log.e("invalidate", "call-location");
+			mDrawView.invalidate();
         	workspace();         
 		}       
     };    
