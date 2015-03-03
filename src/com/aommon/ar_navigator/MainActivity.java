@@ -65,11 +65,12 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     float[] mGeomagnetic;
     
     //TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin,txtCheck;
-    TextView txtCheck;
+    TextView txtCheck,textWarn;
     ImageView imgArr;
     Button btnSearch;
     ImageButton btn_imageType;
     private float currentDegree = 0f;
+    float x;
     
     //Map
     LocationClient mLocationClient;
@@ -78,7 +79,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     GMapV2Direction md;
     ArrayList<LatLng> arr_pos;
     int i,c=0;
-    boolean getInput,click,click_done;
+    boolean getInput,driving,walking,click,send_data_first;
     PointF a[] = new PointF[4];
     PointF at_target[] = new PointF[4];
     PointF near_target[] = new PointF[4];
@@ -114,15 +115,14 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         
         mHelper = new Database(this);
     	mDb = mHelper.getmDbHelper().getWritableDatabase();
-    	
-    	
-    	
-    	
+
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         
         txtCheck = (TextView) findViewById(R.id.txtCheck);
+        textWarn = (TextView) findViewById(R.id.textWarn);
+        
         imgArr = (ImageView)findViewById(R.id.imgArr);
         btnSearch = (Button) findViewById(R.id.b_search);
         btn_imageType = (ImageButton)  findViewById(R.id.btn_imageType);
@@ -145,6 +145,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 			}
 		});
 		
+		send_data_first=true;
 	}
 	
 	protected void onActivityResult ( int requestCode, int resultCode, Intent data )
@@ -180,11 +181,13 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 		                            + ", " + arr_pos.get(j).longitude);
 		    			}
 		    			getInput = true;
+		    			driving = true;
 		    			i = 0;
 		    			imgArr.setImageResource(R.drawable.arrow_red);	
 			        }
 				});
 				click =true;
+				btn_imageType.setImageResource(R.drawable.icon_driving);
 			}
 		}
 	}
@@ -195,69 +198,66 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				public void onClick(View v) {
 					if(c%2 == 1){
 						btn_imageType.setImageResource(R.drawable.icon_driving);
+						walking = false;
+						driving = true;
 					}else{
 						btn_imageType.setImageResource(R.drawable.icon_walking2);
+						driving = false;
+						walking = true;						
 					}
 					c++;
-					//click_done=true;
 				}
 			});
 		}
-		if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5)){
-			con_degree = azimuthInDegress;
+		if(send_data_first){
 	    	//send all to canvas
 			if (lat != 0 && lng != 0){
 				Log.e("check", "2");
-//				a = nearby.nearbyLaLong(lat, lng, 50);
 				mCursor_near = mDb.rawQuery("SELECT  " +  Database.COL_NAME  + "," + Database.COL_LATITUDE + "," + 
 	        		Database.COL_LONGITUDE  + " FROM " + Database.TABLE_NAME , null);
-       
-				Log.e("check2", String.format("%d", mCursor_near.getCount()));
-			   	 mCursor_near.moveToFirst();
+
+			   	mCursor_near.moveToFirst();
 		        if(mCursor_near.moveToFirst()){
 		        	props.clear();
-		        	Log.e("check2", String.format("%d", mCursor_near.getCount()));
+		        	//Log.e("check2", String.format("%d", mCursor_near.getCount()));
 		        	do{	        	
 		        		double latitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LATITUDE));
 		        		double longitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LONGITUDE));
 		        		String name = mCursor_near.getString(mCursor_near.getColumnIndex(Database.COL_NAME));	        		
 		        		//Log.e("check3", String.format("%.8f", longitude));
-		        		Log.e("check4", name);
+		        		//Log.e("check4", name);
 			        	props.add(new Point(latitude, longitude, name));
 		        	} while (mCursor_near.moveToNext());
-		        	Log.e("end", "end");
+		        	//Log.e("end", "end");
 		        	 mDrawView.getnear_lacation(props);
 		        	//Log.e("invalidate", "call-mm");
 		        	mDrawView.invalidate();
 		        }
+		        send_data_first=false;
 			}
-
 		}
 
-		//if((azimuthInDegress > con_degree+5 || azimuthInDegress < con_degree-5) && getInput){
-		if(getInput){
-			
+		if(getInput && driving){			
 			Log.e("onclick","3");		
-
+			
 			near_target = nearby.nearbyLaLong(dlat, dlng, 10);
 			if(lat > near_target[2].x && lat < near_target[0].x && lng < near_target[1].y && lng > near_target[3].y ){
+				//Check LatLng Nearest
 				double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
 				old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
+				//Check LatLng At Destination
 				at_target = nearby.nearbyLaLong(dlat, dlng,7);
 				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
 					getInput = false;	
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
 					txtCheck.setText("");
 					imgArr.setImageBitmap(null);
-					click = true;
+					//click = true;
 				}
 			} else {
-				double distance = Harversine.haversine(dlat, dlng, lat, lng);
+				//Check LatLng by Route
 				double be_lat = arr_pos.get(i).latitude;
 	        	double be_lng = arr_pos.get(i).longitude;
-	        	Log.e("be_lat",""+(String.format("%.8f", be_lat)));
-	        	Log.e("be_lng",""+(String.format("%.8f", be_lng)));
-	        	
 	        	a = nearby.nearbyLaLong(be_lat, be_lng,7);
 				if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
 					Log.e("i+new",""+i);
@@ -267,9 +267,32 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 	                old_rotate = Navigator.Rotate_arrow(azimuthInDegress, angle, old_rotate, imgArr);
 	        	}
 			}
+		}else if (getInput && walking){
+
+			double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
+			old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
+			//Check LatLng At Destination
+			at_target = nearby.nearbyLaLong(dlat, dlng,7);
+			if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
+				getInput = false;	
+				Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
+				txtCheck.setText("");
+				imgArr.setImageBitmap(null);
+				//click = true;
+			}
+			
 		}
 		//Log.e("invalidate", "call-workspace");
 		mDrawView.invalidate();
+		
+        if((int)x<8.0){
+    		//Toast.makeText(MainActivity.this, "XXXXXX", Toast.LENGTH_SHORT).show();
+        	textWarn.setText("Warning : please...");
+    	}else {
+    		textWarn.setText("");
+    	}
+        //txtHeading.setText("X : " + (int)x);
+    	Log.e("acc_x", String.format("%d", (int)x));
 	}
 	
 	 public void onResume() {
@@ -278,7 +301,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         mCamera = Camera.open();
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI); 
-
 
     }
     
@@ -298,7 +320,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     	super.onStart();
     	//GPS
     	mLocationClient.connect();
-
     }
 
     public void surfaceChanged(SurfaceHolder arg0
@@ -346,7 +367,10 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 	public void onSensorChanged(SensorEvent event) {
 		//compass
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            mGravity = event.values;
+            //acc
+            x = event.values[0];
+        	//compass
+        	mGravity = event.values;
         }
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
             mGeomagnetic = event.values;

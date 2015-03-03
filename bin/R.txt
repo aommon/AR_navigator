@@ -339,11 +339,12 @@ int drawable icon_driving 0x7f02007e
 int drawable icon_search2 0x7f02007f
 int drawable icon_walking2 0x7f020080
 int drawable icon_wd 0x7f020081
-int drawable logov1 0x7f020082
-int drawable powered_by_google_dark 0x7f020083
-int drawable powered_by_google_light 0x7f020084
-int drawable t1logo 0x7f020085
-int drawable t2logo 0x7f020086
+int drawable icon_wd2 0x7f020082
+int drawable logov1 0x7f020083
+int drawable powered_by_google_dark 0x7f020084
+int drawable powered_by_google_light 0x7f020085
+int drawable t1logo 0x7f020086
+int drawable t2logo 0x7f020087
 int id action_bar 0x7f080030
 int id action_bar_activity_content 0x7f080029
 int id action_bar_container 0x7f08002f
@@ -355,7 +356,7 @@ int id action_context_bar 0x7f080031
 int id action_menu_divider 0x7f08002a
 int id action_menu_presenter 0x7f08002b
 int id action_mode_close_button 0x7f080038
-int id action_settings 0x7f080063
+int id action_settings 0x7f080064
 int id activity_chooser_view_content 0x7f080039
 int id adjust_height 0x7f080002
 int id adjust_width 0x7f080001
@@ -388,7 +389,7 @@ int id icon 0x7f08003e
 int id ifRoom 0x7f08001f
 int id image 0x7f08003b
 int id imgArr 0x7f08005d
-int id l_name 0x7f080062
+int id l_name 0x7f080063
 int id listMode 0x7f080016
 int id list_item 0x7f08003d
 int id match_parent 0x7f08000e
@@ -425,6 +426,7 @@ int id submit_area 0x7f08004d
 int id tabMode 0x7f080017
 int id terrain 0x7f080005
 int id textInf 0x7f080052
+int id textWarn 0x7f080062
 int id title 0x7f08003f
 int id top_action_bar 0x7f080034
 int id txtAngle 0x7f080059

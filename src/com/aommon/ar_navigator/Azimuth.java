@@ -19,7 +19,7 @@ public class Azimuth {
         return (_bearing(lat2, long2, lat1, long1) + 180.0) % 360;
     }
 
-    static private Double _bearing(Double lat1, Double long1, Double lat2, Double long2)
+    public static Double _bearing(Double lat1, Double long1, Double lat2, Double long2)
     {
         Double phi1 = lat1 * degToRad;
         Double phi2 = lat2 * degToRad;

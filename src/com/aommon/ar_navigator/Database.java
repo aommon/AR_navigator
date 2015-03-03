@@ -41,7 +41,7 @@ public class Database {
 	        try {  
 	            BufferedReader br = new BufferedReader(
 	                    new InputStreamReader(context.getAssets().open(
-	                    "Database_v1_ms.csv")));  
+	                    "Database_v1.csv")));  
 	            String readLine = null;  
 	            readLine = br.readLine();  
 	

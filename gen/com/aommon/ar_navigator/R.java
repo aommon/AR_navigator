@@ -1508,11 +1508,12 @@ containing a value of this type.
         public static final int icon_search2=0x7f02007f;
         public static final int icon_walking2=0x7f020080;
         public static final int icon_wd=0x7f020081;
-        public static final int logov1=0x7f020082;
-        public static final int powered_by_google_dark=0x7f020083;
-        public static final int powered_by_google_light=0x7f020084;
-        public static final int t1logo=0x7f020085;
-        public static final int t2logo=0x7f020086;
+        public static final int icon_wd2=0x7f020082;
+        public static final int logov1=0x7f020083;
+        public static final int powered_by_google_dark=0x7f020084;
+        public static final int powered_by_google_light=0x7f020085;
+        public static final int t1logo=0x7f020086;
+        public static final int t2logo=0x7f020087;
     }
     public static final class id {
         public static final int action_bar=0x7f080030;
@@ -1526,7 +1527,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f08002a;
         public static final int action_menu_presenter=0x7f08002b;
         public static final int action_mode_close_button=0x7f080038;
-        public static final int action_settings=0x7f080063;
+        public static final int action_settings=0x7f080064;
         public static final int activity_chooser_view_content=0x7f080039;
         public static final int adjust_height=0x7f080002;
         public static final int adjust_width=0x7f080001;
@@ -1559,7 +1560,7 @@ containing a value of this type.
         public static final int ifRoom=0x7f08001f;
         public static final int image=0x7f08003b;
         public static final int imgArr=0x7f08005d;
-        public static final int l_name=0x7f080062;
+        public static final int l_name=0x7f080063;
         public static final int listMode=0x7f080016;
         public static final int list_item=0x7f08003d;
         public static final int match_parent=0x7f08000e;
@@ -1596,6 +1597,7 @@ containing a value of this type.
         public static final int tabMode=0x7f080017;
         public static final int terrain=0x7f080005;
         public static final int textInf=0x7f080052;
+        public static final int textWarn=0x7f080062;
         public static final int title=0x7f08003f;
         public static final int top_action_bar=0x7f080034;
         public static final int txtAngle=0x7f080059;
