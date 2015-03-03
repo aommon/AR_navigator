@@ -79,7 +79,8 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     GMapV2Direction md;
     ArrayList<LatLng> arr_pos;
     int i,c=0;
-    boolean getInput,driving,walking,click,send_data_first;
+    boolean getInput,driving,walking,click,send_data_first,isInternetPresent;
+    check_internet cd;
     PointF a[] = new PointF[4];
     PointF at_target[] = new PointF[4];
     PointF near_target[] = new PointF[4];
@@ -137,15 +138,19 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         	finish();
         }  
         
-		btnSearch.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(),
-						SearchLocation.class);
-				startActivityForResult(intent, 999);
-			}
-		});
-		
-		send_data_first=true;
+        cd = new check_internet(getApplicationContext());
+		isInternetPresent = cd.isConnectingToInternet();
+		if(isInternetPresent){
+			btnSearch.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					Intent intent = new Intent(getApplicationContext(),
+							SearchLocation.class);
+					startActivityForResult(intent, 999);
+				}
+			});
+		} else {
+			Toast.makeText(getApplicationContext(), "Please connect your INTERNET!!", Toast.LENGTH_LONG).show();
+		}
 	}
 	
 	protected void onActivityResult ( int requestCode, int resultCode, Intent data )
@@ -292,7 +297,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     		textWarn.setText("");
     	}
         //txtHeading.setText("X : " + (int)x);
-    	Log.e("acc_x", String.format("%d", (int)x));
+    	//Log.e("acc_x", String.format("%d", (int)x));
 	}
 	
 	 public void onResume() {

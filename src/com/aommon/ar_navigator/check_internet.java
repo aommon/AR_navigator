@@ -5,18 +5,26 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 public class check_internet {
-	public boolean isNetworkConnected() {
-		  ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		  NetworkInfo ni = cm.getActiveNetworkInfo();
-		  if (ni == null) {
-		   // There are no active networks.
-		   return false;
-		  } else
-		   return true;
-	}
+	private Context _context;
+    
+    public check_internet(Context context){
+        this._context = context;
+    }
+ 
+    public boolean isConnectingToInternet(){
+        ConnectivityManager connectivity = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+          if (connectivity != null) 
+          {
+              NetworkInfo[] info = connectivity.getAllNetworkInfo();
+              if (info != null) 
+                  for (int i = 0; i < info.length; i++) 
+                      if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                      {
+                          return true;
+                      }
+ 
+          }
+          return false;
+    }
 
-	private ConnectivityManager getSystemService(String connectivityService) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

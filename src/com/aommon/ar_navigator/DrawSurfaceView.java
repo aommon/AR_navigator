@@ -9,6 +9,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Paint.FontMetrics;
+import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +19,8 @@ public class DrawSurfaceView extends View {
 
 	Point me = new Point(-33.870932d, 151.204727d, "Me");
 	Paint mPaint = new Paint();
-	Paint mPaint_rec = new Paint();
+	Paint tPaint = new Paint();
+	FontMetrics fm = new FontMetrics();
 	double OFFSET = 0d; //we aren't using this yet, that will come in the next step
 	double screenWidth, screenHeight = 0d;
 	Bitmap[] mSpots, mBlips;
@@ -38,10 +41,11 @@ public class DrawSurfaceView extends View {
 	public DrawSurfaceView(Context context, AttributeSet set) {
 		super(context, set);
 		//Log.e("invalidate", "start draw");
-		mPaint.setColor(Color.GREEN);		
-		mPaint.setTextSize(30);
-		mPaint.setStrokeWidth(DpiUtils.getPxFromDpi(getContext(), 2));
-		mPaint.setAntiAlias(true);
+		mPaint.setColor(Color.DKGRAY);
+        mPaint.setStyle(Style.FILL);
+        mPaint.setAlpha(100);
+        tPaint.setColor(Color.GREEN);
+        tPaint.setTextSize(50);
 		
 		mSpots = new Bitmap[18];
 		Log.e("mSpots-size", String.format("%d", mSpots.length));
@@ -98,13 +102,12 @@ public class DrawSurfaceView extends View {
 				    else
 				        u.x = (float) (float)(screenWidth*9); //somewhere off the screen
 
-				    u.y = (float)screenHeight/3 + spotCentreY;
-				    
-				    //mPaint.setColor(Color.CYAN);
-				    //mPaint.setAlpha(5);
-				    //canvas.drawRect(u.x, 0, u.x+700, u.y, mPaint); //rect
-				    canvas.drawBitmap(spot, u.x, u.y, mPaint); //camera spot
-				    canvas.drawText(u.description, u.x, u.y, mPaint); //text
+				    u.y = (float)screenHeight/5 + spotCentreY;
+
+				    tPaint.setTextAlign(Paint.Align.CENTER);
+				    tPaint.getFontMetrics(fm);
+				    canvas.drawRect((u.x-20)-tPaint.measureText(u.description)/2, (u.y-20) - tPaint.getTextSize(), (u.x+20) + tPaint.measureText(u.description)/2, (u.y+20), mPaint);
+		            canvas.drawText(u.description, u.x, u.y ,tPaint);
 			    }
 			}
 		}
