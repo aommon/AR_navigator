@@ -28,11 +28,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
 
 public class GMapV2Direction {
 	public static final String TAG = "GMapV2Direction.java";
@@ -85,7 +87,7 @@ public class GMapV2Direction {
     public GMapV2Direction(Context context) { 
     	mContext = context;
     }
- 
+
     public String request(LatLng start, LatLng end, String mode) {
         final String url = "http://maps.googleapis.com/maps/api/directions/xml?"
                 + "origin=" + start.latitude + "," + start.longitude  
@@ -94,8 +96,9 @@ public class GMapV2Direction {
 
    		if(isLogging)
    			Log.i("GoogleDirection", "URL : " + url);
-        new RequestTask().execute(new String[]{ url });
-        Log.e("RequestDirection", url);
+	        new RequestTask().execute(new String[]{ url });
+	        Log.e("RequestDirection", url);
+   		
         return url;
     }
     
@@ -120,9 +123,18 @@ public class GMapV2Direction {
 		}
 		
 		protected void onPostExecute(Document doc) {
-			super.onPostExecute(doc);
-			if(mDirectionListener != null)
-				mDirectionListener.onResponse(getStatus(doc), doc, GMapV2Direction.this);
+			try{
+				super.onPostExecute(doc);
+				if(mDirectionListener != null)
+					mDirectionListener.onResponse(getStatus(doc), doc, GMapV2Direction.this);
+			}catch (Exception e) {
+/*				AlertDialog.Builder builder = new AlertDialog.Builder(GMapV2Direction.this);
+                builder.setTitle("ข้อมูลสถานที่");
+                //builder.setMessage(name + "\n\nLatitude : " + slat + "\n\nLongitude : " + slong);
+                builder.setNeutralButton("OK", null);
+                builder.show();*/
+				//Toast.makeText(getApplicationContext(), "Please connect your INTERNET!!", Toast.LENGTH_LONG).show();
+	        }
 		}
 	    
 	   	private String getStatus(Document doc) {

@@ -127,7 +127,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/txtAngle"
-        android:alpha="0.7"
+        android:alpha="0.6"
         android:layout_centerHorizontal="true"/>
 
     <Button
@@ -166,6 +166,7 @@
         android:layout_height="wrap_content"   
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/b_search"
+        android:visibility="gone"
         android:src="@drawable/icon_wd2" />
     
      <!-- view android:layout_width="fill_parent"

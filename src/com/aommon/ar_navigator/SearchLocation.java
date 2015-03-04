@@ -1,6 +1,8 @@
 package com.aommon.ar_navigator;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -23,6 +25,8 @@ public class SearchLocation  extends Activity {
 
 	private AutoCompleteTextView mLNameView;
 	private Database mDbHelper;
+	String mode = " ";
+	String r_name;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +48,41 @@ public class SearchLocation  extends Activity {
 					int position, long id) {
 				// TODO Auto-generated method stub
 				Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-				String r_name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+				r_name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
 				double r_lat = cursor.getDouble(cursor.getColumnIndex("latitude"));
                 double r_long = cursor.getDouble(cursor.getColumnIndex("longitude"));
-                Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                final Intent i = new Intent(getApplicationContext(),MainActivity.class);
                 i.putExtra("mydName", r_name);
                 i.putExtra("mydLat", r_lat);
 				i.putExtra("mydLong", r_long);
 				Log.e(TAG,"Item Click : "+ r_name + " " + r_lat + "," + r_long);
-				setResult(RESULT_OK, i);
-        		finish();				
+				AlertDialog.Builder builder = new AlertDialog.Builder(SearchLocation.this);
+                builder.setTitle("เลือกรูปแบบการนำทาง");
+                builder.setPositiveButton("Driving", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						mode = "driving";
+						i.putExtra("mydMode", mode);
+						Log.e(TAG,"Mode : "+ mode);
+						setResult(RESULT_OK, i);
+						finish();
+					}
+				});
+                builder.setNegativeButton("Walking", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						mode = "walking";
+						i.putExtra("mydMode", mode);
+						Log.e(TAG,"Mode : "+ mode);
+						setResult(RESULT_OK, i);
+						finish();
+					}
+				});
+                builder.show();				
 			}
 		});
 		
@@ -81,5 +110,6 @@ public class SearchLocation  extends Activity {
 		});
 
 	}
+
 
 }

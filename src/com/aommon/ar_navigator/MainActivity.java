@@ -55,6 +55,9 @@ import android.widget.Toast;
 
 public class MainActivity<CustomView> extends Activity implements SurfaceHolder.Callback, SensorEventListener, AutoFocusCallback {
 
+	String dMode;
+	static String dName="";
+	
 	Camera mCamera;
     SurfaceView mPreview;
     
@@ -139,7 +142,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         }  
         
         cd = new check_internet(getApplicationContext());
-		isInternetPresent = cd.isConnectingToInternet();
+        isInternetPresent = cd.isConnectingToInternet();
 		if(isInternetPresent){
 			btnSearch.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
@@ -151,65 +154,81 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 		} else {
 			Toast.makeText(getApplicationContext(), "Please connect your INTERNET!!", Toast.LENGTH_LONG).show();
 		}
+		send_data_first=true;
 	}
 	
 	protected void onActivityResult ( int requestCode, int resultCode, Intent data )
 	{
 		if(requestCode == 999)
-		{
-			
+		{			
 			if(resultCode == RESULT_OK ){
-				String dName = data.getStringExtra("mydName");
+				dName = data.getStringExtra("mydName");
 				dlat = data.getDoubleExtra("mydLat", lat);
 				dlng = data.getDoubleExtra("mydLong", lng);
+				dMode = data.getStringExtra("mydMode");
 				Log.e(TAG, "Destination : " + dName + " " + dlat + "," + dlng);
 				btnSearch.setText(dName);
 				LatLng startPosition = new LatLng(lat, lng);
 				LatLng endPosition = new LatLng(dlat , dlng);
 				Log.e(TAG,"start : "+startPosition);
 				Log.e(TAG,"end : "+endPosition);
-				Log.e(TAG, GMapV2Direction.MODE_DRIVING);
-				md.request(startPosition
-		                , endPosition, GMapV2Direction.MODE_DRIVING);
-				Log.e("onclick","1");
-				md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
-			        public void onResponse(String status, Document doc, GMapV2Direction gd) {
-			        	Log.e("onclick","2");
-		        		int distance = gd.getTotalDistanceValue(doc);
-		        		Log.e(TAG,"Total Distance : "+distance);
-		        		int duration = gd.getTotalDurationValue(doc);
-		        		Log.e(TAG,"Total Duration : "+duration);
-		        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
-		                arr_pos = gd.getDirection(doc);
-		    			for(int j = 0 ; j < arr_pos.size() ; j++) {
-		                    Log.e("Position " + j, arr_pos.get(j).latitude
-		                            + ", " + arr_pos.get(j).longitude);
-		    			}
-		    			getInput = true;
-		    			driving = true;
-		    			i = 0;
-		    			imgArr.setImageResource(R.drawable.arrow_red);	
-			        }
-				});
+			//	Log.e(TAG, dMode);
+//				try{
+					md.request(startPosition
+			                , endPosition, GMapV2Direction.MODE_DRIVING);
+					Log.e("onclick","1");
+		        
+					md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
+				        public void onResponse(String status, Document doc, GMapV2Direction gd) {
+				        	Log.e("onclick","2");
+			        		int distance = gd.getTotalDistanceValue(doc);
+			        		Log.e(TAG,"Total Distance : "+distance);
+			        		int duration = gd.getTotalDurationValue(doc);
+			        		Log.e(TAG,"Total Duration : "+duration);
+			        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+			                arr_pos = gd.getDirection(doc);
+			    			for(int j = 0 ; j < arr_pos.size() ; j++) {
+			                    Log.e("Position " + j, arr_pos.get(j).latitude
+			                            + ", " + arr_pos.get(j).longitude);
+			    			}
+			    			getInput = true;
+			    			driving = true;
+			    			i = 0;
+			    			imgArr.setImageResource(R.drawable.arrow_green);	
+				        }
+					});
+/*		        }catch (Exception e) {
+		        	ShowAlertDialog.Show_Dialog(MainActivity.this, "No Internet Connection","You don't have internet connection.", false);
+		        }
+*/
 				click =true;
-				btn_imageType.setImageResource(R.drawable.icon_driving);
+				btn_imageType.setVisibility(View.VISIBLE);
+				//Log.e(TAG, dMode);
+				String driving = "driving";
+				if(dMode .equals(driving)){
+					btn_imageType.setImageResource(R.drawable.icon_driving);
+				}else{
+					btn_imageType.setImageResource(R.drawable.icon_walking2);
+				}
 			}
 		}
 	}
 
 	public void workspace(){
+		
 		if(click){
-			btn_imageType.setOnClickListener(new OnClickListener() {
+			btn_imageType.setOnClickListener(new OnClickListener() {			
 				public void onClick(View v) {
 					if(c%2 == 1){
 						btn_imageType.setImageResource(R.drawable.icon_driving);
+						
 						walking = false;
 						driving = true;
 					}else{
 						btn_imageType.setImageResource(R.drawable.icon_walking2);
 						driving = false;
 						walking = true;						
-					}
+					}					
 					c++;
 				}
 			});
@@ -257,7 +276,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
 					txtCheck.setText("");
 					imgArr.setImageBitmap(null);
-					//click = true;
+					dName = "";
 				}
 			} else {
 				//Check LatLng by Route
@@ -283,12 +302,12 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
 				txtCheck.setText("");
 				imgArr.setImageBitmap(null);
-				//click = true;
+				dName = "";
 			}
 			
 		}
 		//Log.e("invalidate", "call-workspace");
-		mDrawView.invalidate();
+		//mDrawView.invalidate();
 		
         if((int)x<8.0){
     		//Toast.makeText(MainActivity.this, "XXXXXX", Toast.LENGTH_SHORT).show();
@@ -306,7 +325,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         mCamera = Camera.open();
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI); 
-
     }
     
     public void onPause() {
@@ -319,7 +337,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     public void onStop() {
         super.onStop();
         sensorManager.unregisterListener(this);
-
+        dName = "";
     }
     protected void onStart(){
     	super.onStart();
@@ -390,17 +408,19 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
             	azimuthInDegress = (float)Math.toDegrees(degree);
             	if (azimuthInDegress < 0.0f) {
             		azimuthInDegress += 360.0f;
-            	}           	
+            	}
             }
         }
         //canvas
         float true_deg = nearby.true_compass(azimuthInDegress);
-        
-		if (mDrawView != null) {
-			mDrawView.setOffset(true_deg);
-			//Log.e("invalidate", "call-sensor");
-			mDrawView.invalidate();
-		}
+        if(true_deg < true_deg+7 || true_deg > true_deg-7){
+        	if (mDrawView != null) {
+    			mDrawView.setOffset(true_deg);
+    			Log.e("invalidate", "call-sensor");
+    			mDrawView.invalidate();
+    		}
+        }
+		
         workspace();
 	}
     
@@ -441,5 +461,12 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 			mDrawView.invalidate();
         	workspace();         
 		}       
-    };    
+    };  
+    
+	static public String send_choose_name(){
+		if(dName != ""){
+			return dName;
+		}else
+			return "";
+	}
 }

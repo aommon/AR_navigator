@@ -9,6 +9,7 @@
         android:inputType="textNoSuggestions"
         android:layout_height="wrap_content"
         android:completionThreshold="1"
-        android:id="@+id/l_name" />
+        android:id="@+id/l_name"
+        android:imeOptions="flagNoExtractUi" />
 
 </LinearLayout>
