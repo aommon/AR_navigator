@@ -64,6 +64,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     SensorManager sensorManager;
     Sensor accelerometer,magnetometer;
     float degree,con_degree,azimuthInDegress,old_rotate;
+    float x1,x2;
     float[] mGravity;
     float[] mGeomagnetic;
     
@@ -92,6 +93,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     //canvas
     DrawSurfaceView mDrawView;
     public static ArrayList<Point> props = new ArrayList<Point>();
+    float true_deg;
     
     //Database
     SQLiteDatabase mDb;  
@@ -411,16 +413,19 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
             	}
             }
         }
-        //canvas
-        float true_deg = nearby.true_compass(azimuthInDegress);
-        if(true_deg < true_deg+7 || true_deg > true_deg-7){
-        	if (mDrawView != null) {
-    			mDrawView.setOffset(true_deg);
-    			Log.e("invalidate", "call-sensor");
-    			mDrawView.invalidate();
-    		}
+        //canvas        
+        x1=x2;
+        x2=azimuthInDegress;
+        if(x2 > x1+1 || x2 < x1-1){
+        	true_deg = nearby.true_compass(x2);
         }
-		
+        
+    	if (mDrawView != null) {
+			mDrawView.setOffset(true_deg);
+			Log.e("invalidate", "call-sensor");
+			mDrawView.invalidate();
+		}
+    	//Log.e("x_draw", "draw")
         workspace();
 	}
     
