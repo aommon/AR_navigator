@@ -69,7 +69,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     float[] mGeomagnetic;
     
     //TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin,txtCheck;
-    TextView txtCheck,textWarn;
+    TextView textWarn;
     ImageView imgArr;
     Button btnSearch;
     ImageButton btn_imageType;
@@ -126,7 +126,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         
-        txtCheck = (TextView) findViewById(R.id.txtCheck);
+       // txtCheck = (TextView) findViewById(R.id.txtCheck);
         textWarn = (TextView) findViewById(R.id.textWarn);
         
         imgArr = (ImageView)findViewById(R.id.imgArr);
@@ -177,7 +177,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 			//	Log.e(TAG, dMode);
 //				try{
 					md.request(startPosition
-			                , endPosition, GMapV2Direction.MODE_DRIVING);
+			                , endPosition, dMode);
 					Log.e("onclick","1");
 		        
 					md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
@@ -187,14 +187,13 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 			        		Log.e(TAG,"Total Distance : "+distance);
 			        		int duration = gd.getTotalDurationValue(doc);
 			        		Log.e(TAG,"Total Duration : "+duration);
-			        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+		//	        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 			                arr_pos = gd.getDirection(doc);
 			    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 			                    Log.e("Position " + j, arr_pos.get(j).latitude
 			                            + ", " + arr_pos.get(j).longitude);
 			    			}
 			    			getInput = true;
-			    			driving = true;
 			    			i = 0;
 			    			imgArr.setImageResource(R.drawable.arrow_green);	
 				        }
@@ -206,11 +205,14 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				click =true;
 				btn_imageType.setVisibility(View.VISIBLE);
 				//Log.e(TAG, dMode);
-				String driving = "driving";
-				if(dMode .equals(driving)){
+				if(dMode .equals("driving")){
 					btn_imageType.setImageResource(R.drawable.icon_driving);
+					driving=true;
+					walking=false;
 				}else{
 					btn_imageType.setImageResource(R.drawable.icon_walking2);
+					driving=false;
+					walking=true;
 				}
 			}
 		}
@@ -223,11 +225,60 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				public void onClick(View v) {
 					if(c%2 == 1){
 						btn_imageType.setImageResource(R.drawable.icon_driving);
-						
+						//Google
+						LatLng startPosition = new LatLng(lat, lng);
+						LatLng endPosition = new LatLng(dlat , dlng);
+						md.request(startPosition
+				                , endPosition, GMapV2Direction.MODE_DRIVING);
+						Log.e("onclick","1");
+			        
+						md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
+					        public void onResponse(String status, Document doc, GMapV2Direction gd) {
+					        	Log.e("onclick","2");
+				        		int distance = gd.getTotalDistanceValue(doc);
+				        		Log.e(TAG,"Total Distance : "+distance);
+				        		int duration = gd.getTotalDurationValue(doc);
+				        		Log.e(TAG,"Total Duration : "+duration);
+		//		        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+				                arr_pos = gd.getDirection(doc);
+				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
+				                    Log.e("Position " + j, arr_pos.get(j).latitude
+				                            + ", " + arr_pos.get(j).longitude);
+				    			}
+				    			getInput = true;
+				    			i = 0;
+				    			imgArr.setImageResource(R.drawable.arrow_green);	
+					        }
+						});
 						walking = false;
 						driving = true;
 					}else{
 						btn_imageType.setImageResource(R.drawable.icon_walking2);
+						//Google
+						LatLng startPosition = new LatLng(lat, lng);
+						LatLng endPosition = new LatLng(dlat , dlng);
+						md.request(startPosition
+				                , endPosition, GMapV2Direction.MODE_WALKING);
+						Log.e("onclick","1");
+			        
+						md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
+					        public void onResponse(String status, Document doc, GMapV2Direction gd) {
+					        	Log.e("onclick","2");
+				        		int distance = gd.getTotalDistanceValue(doc);
+				        		Log.e(TAG,"Total Distance : "+distance);
+				        		int duration = gd.getTotalDurationValue(doc);
+				        		Log.e(TAG,"Total Duration : "+duration);
+		//		        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+				                arr_pos = gd.getDirection(doc);
+				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
+				                    Log.e("Position " + j, arr_pos.get(j).latitude
+				                            + ", " + arr_pos.get(j).longitude);
+				    			}
+				    			getInput = true;
+				    			i = 0;
+				    			imgArr.setImageResource(R.drawable.arrow_green);	
+					        }
+						});
 						driving = false;
 						walking = true;						
 					}					
@@ -276,7 +327,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
 					getInput = false;	
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
-					txtCheck.setText("");
+		//			txtCheck.setText("");
 					imgArr.setImageBitmap(null);
 					dName = "";
 				}
@@ -294,8 +345,36 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 	        	}
 			}
 		}else if (getInput && walking){
+			near_target = nearby.nearbyLaLong(dlat, dlng, 10);
+			if(lat > near_target[2].x && lat < near_target[0].x && lng < near_target[1].y && lng > near_target[3].y ){
+				//Check LatLng Nearest
+				double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
+				old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
+				//Check LatLng At Destination
+				at_target = nearby.nearbyLaLong(dlat, dlng,7);
+				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
+					getInput = false;	
+					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
+		//			txtCheck.setText("");
+					imgArr.setImageBitmap(null);
+					dName = "";
+				}
+			} else {
+				//Check LatLng by Route
+				double be_lat = arr_pos.get(i).latitude;
+	        	double be_lng = arr_pos.get(i).longitude;
+	        	a = nearby.nearbyLaLong(be_lat, be_lng,7);
+				if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
+					Log.e("i+new",""+i);
+					i++;
+	         	}else{
+	        		angle = Azimuth.initial(lat, lng, be_lat, be_lng);
+	                old_rotate = Navigator.Rotate_arrow(azimuthInDegress, angle, old_rotate, imgArr);
+	        	}
+			}
 
-			double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
+/*OLD only direct to Destination
+ * 			double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
 			old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
 			//Check LatLng At Destination
 			at_target = nearby.nearbyLaLong(dlat, dlng,7);
@@ -306,16 +385,16 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				imgArr.setImageBitmap(null);
 				dName = "";
 			}
-			
+*/			
 		}
 		//Log.e("invalidate", "call-workspace");
 		//mDrawView.invalidate();
 		
-        if((int)x<8.0){
+        if(x<8.0){
     		//Toast.makeText(MainActivity.this, "XXXXXX", Toast.LENGTH_SHORT).show();
-        	textWarn.setText("Warning : please...");
+     //   	textWarn.setText("Warning!");
     	}else {
-    		textWarn.setText("");
+    	//l	textWarn.setText("");
     	}
         //txtHeading.setText("X : " + (int)x);
     	//Log.e("acc_x", String.format("%d", (int)x));
