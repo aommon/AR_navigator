@@ -69,7 +69,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     float[] mGeomagnetic;
     
     //TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin,txtCheck;
-    TextView textWarn;
+    TextView textWarn,txtCheck;
     ImageView imgArr;
     Button btnSearch;
     ImageButton btn_imageType;
@@ -83,7 +83,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     GMapV2Direction md;
     ArrayList<LatLng> arr_pos;
     int i,c=0;
-    boolean getInput,driving,walking,click,send_data_first,isInternetPresent;
+    boolean getInput,click,send_data_first,isInternetPresent;
     check_internet cd;
     PointF a[] = new PointF[4];
     PointF at_target[] = new PointF[4];
@@ -126,7 +126,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         
-       // txtCheck = (TextView) findViewById(R.id.txtCheck);
+        txtCheck = (TextView) findViewById(R.id.txtCheck);
         textWarn = (TextView) findViewById(R.id.textWarn);
         
         imgArr = (ImageView)findViewById(R.id.imgArr);
@@ -187,7 +187,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 			        		Log.e(TAG,"Total Distance : "+distance);
 			        		int duration = gd.getTotalDurationValue(doc);
 			        		Log.e(TAG,"Total Duration : "+duration);
-		//	        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+			        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 			                arr_pos = gd.getDirection(doc);
 			    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 			                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -207,12 +207,8 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				//Log.e(TAG, dMode);
 				if(dMode .equals("driving")){
 					btn_imageType.setImageResource(R.drawable.icon_driving);
-					driving=true;
-					walking=false;
 				}else{
 					btn_imageType.setImageResource(R.drawable.icon_walking2);
-					driving=false;
-					walking=true;
 				}
 			}
 		}
@@ -239,7 +235,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				        		Log.e(TAG,"Total Distance : "+distance);
 				        		int duration = gd.getTotalDurationValue(doc);
 				        		Log.e(TAG,"Total Duration : "+duration);
-		//		        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+				        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 				                arr_pos = gd.getDirection(doc);
 				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 				                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -250,8 +246,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				    			imgArr.setImageResource(R.drawable.arrow_green);	
 					        }
 						});
-						walking = false;
-						driving = true;
 					}else{
 						btn_imageType.setImageResource(R.drawable.icon_walking2);
 						//Google
@@ -268,7 +262,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				        		Log.e(TAG,"Total Distance : "+distance);
 				        		int duration = gd.getTotalDurationValue(doc);
 				        		Log.e(TAG,"Total Duration : "+duration);
-		//		        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+				        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 				                arr_pos = gd.getDirection(doc);
 				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 				                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -279,18 +273,18 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				    			imgArr.setImageResource(R.drawable.arrow_green);	
 					        }
 						});
-						driving = false;
-						walking = true;						
+					
 					}					
 					c++;
 				}
 			});
 		}
+		
 		if(send_data_first){
 	    	//send all to canvas
 			if (lat != 0 && lng != 0){
 				Log.e("check", "2");
-				mCursor_near = mDb.rawQuery("SELECT  " +  Database.COL_NAME  + "," + Database.COL_LATITUDE + "," + 
+				mCursor_near = mDb.rawQuery("SELECT  " +  Database.COL_DISPLAY_NAME  + "," + Database.COL_LATITUDE + "," + 
 	        		Database.COL_LONGITUDE  + " FROM " + Database.TABLE_NAME , null);
 
 			   	mCursor_near.moveToFirst();
@@ -300,7 +294,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 		        	do{	        	
 		        		double latitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LATITUDE));
 		        		double longitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LONGITUDE));
-		        		String name = mCursor_near.getString(mCursor_near.getColumnIndex(Database.COL_NAME));	        		
+		        		String name = mCursor_near.getString(mCursor_near.getColumnIndex(Database.COL_DISPLAY_NAME));	        		
 		        		//Log.e("check3", String.format("%.8f", longitude));
 		        		//Log.e("check4", name);
 			        	props.add(new Point(latitude, longitude, name));
@@ -314,7 +308,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 			}
 		}
 
-		if(getInput && driving){			
+		if(getInput){			
 			Log.e("onclick","3");		
 			
 			near_target = nearby.nearbyLaLong(dlat, dlng, 10);
@@ -327,7 +321,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
 					getInput = false;	
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
-		//			txtCheck.setText("");
+					txtCheck.setText("");
 					imgArr.setImageBitmap(null);
 					dName = "";
 				}
@@ -344,60 +338,17 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 	                old_rotate = Navigator.Rotate_arrow(azimuthInDegress, angle, old_rotate, imgArr);
 	        	}
 			}
-		}else if (getInput && walking){
-			near_target = nearby.nearbyLaLong(dlat, dlng, 10);
-			if(lat > near_target[2].x && lat < near_target[0].x && lng < near_target[1].y && lng > near_target[3].y ){
-				//Check LatLng Nearest
-				double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
-				old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
-				//Check LatLng At Destination
-				at_target = nearby.nearbyLaLong(dlat, dlng,7);
-				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
-					getInput = false;	
-					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
-		//			txtCheck.setText("");
-					imgArr.setImageBitmap(null);
-					dName = "";
-				}
-			} else {
-				//Check LatLng by Route
-				double be_lat = arr_pos.get(i).latitude;
-	        	double be_lng = arr_pos.get(i).longitude;
-	        	a = nearby.nearbyLaLong(be_lat, be_lng,7);
-				if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
-					Log.e("i+new",""+i);
-					i++;
-	         	}else{
-	        		angle = Azimuth.initial(lat, lng, be_lat, be_lng);
-	                old_rotate = Navigator.Rotate_arrow(azimuthInDegress, angle, old_rotate, imgArr);
-	        	}
-			}
-
-/*OLD only direct to Destination
- * 			double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
-			old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
-			//Check LatLng At Destination
-			at_target = nearby.nearbyLaLong(dlat, dlng,7);
-			if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
-				getInput = false;	
-				Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
-				txtCheck.setText("");
-				imgArr.setImageBitmap(null);
-				dName = "";
-			}
-*/			
 		}
 		//Log.e("invalidate", "call-workspace");
 		//mDrawView.invalidate();
 		
         if(x<8.0){
     		//Toast.makeText(MainActivity.this, "XXXXXX", Toast.LENGTH_SHORT).show();
-     //   	textWarn.setText("Warning!");
+        	textWarn.setText("Warning!");
     	}else {
-    	//l	textWarn.setText("");
+    		textWarn.setText("");
     	}
-        //txtHeading.setText("X : " + (int)x);
-    	//Log.e("acc_x", String.format("%d", (int)x));
+        
 	}
 	
 	 public void onResume() {
@@ -551,6 +502,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 		if(dName != ""){
 			return dName;
 		}else
-			return "";
+			return "xxx";
 	}
 }

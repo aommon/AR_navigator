@@ -21,6 +21,7 @@ public class Database {
     public static final String TABLE_NAME = "Location";  
    
     public static final String COL_NAME  = "name";  
+    public static final String COL_DISPLAY_NAME  = "display_name";
     public static final String COL_LATITUDE = "latitude";  
     public static final String COL_LONGITUDE = "longitude";  	    
      
@@ -35,13 +36,15 @@ public class Database {
 	    public void onCreate(SQLiteDatabase db) {  
 	        db.execSQL("CREATE TABLE " + TABLE_NAME 
 	                + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, "   
-	                + COL_NAME  + " TEXT, " + COL_LATITUDE + " DOUBLE, " 
+	                + COL_NAME  + " TEXT, " 
+	                + COL_DISPLAY_NAME + " TEXT, " 
+	                + COL_LATITUDE + " DOUBLE, " 
 	                + COL_LONGITUDE + " DOUBLE);");  
 	           
 	        try {  
 	            BufferedReader br = new BufferedReader(
 	                    new InputStreamReader(context.getAssets().open(
-	                    "Database_v2.csv")));  
+	                    "Database_v4.csv")));  
 	            String readLine = null;  
 	            readLine = br.readLine();  
 	
@@ -50,13 +53,14 @@ public class Database {
 	                	//Log.i("Data Input", readLine);
 	                    String[] str = readLine.split(",");  
 	                    db.execSQL("INSERT INTO " + TABLE_NAME 
-	                        + " (" + COL_NAME  + ", " + COL_LATITUDE 
-	                        + ", " + COL_LONGITUDE  
+	                        + " (" + COL_NAME  + ", " 
+	                    		+ COL_DISPLAY_NAME + ", " 
+	                    		+ COL_LATITUDE + ", " 
+	                    		+ COL_LONGITUDE  
 	                        + ") VALUES ('" + str[0] 
-	                        + "', '" + str[1] + "', '" 
-	                        + str[2] + "');");   
-	                    
-	                    
+	                        + "', '" + str[1] 
+	                        + "', '" + str[2] + "', '" 
+	                        + str[3] + "');");   
 	                }  
 	            } catch (IOException e) {  
 	                e.printStackTrace();  
@@ -98,7 +102,7 @@ public class Database {
 			// in the query parameters, and not in the query string proper.
 			// See http://code.google.com/p/android/issues/detail?id=3153
 
-			queryString += " WHERE " + COL_NAME + " LIKE '%" + constraint + "%'";
+			queryString += " WHERE " + COL_NAME + " LIKE '%" + constraint + "%' OR " + COL_DISPLAY_NAME + " LIKE '%" + constraint + "%'";
 			queryString += " ORDER BY " + COL_NAME + " ASC";
 			Log.e(TAG, "Call like");
 		}
