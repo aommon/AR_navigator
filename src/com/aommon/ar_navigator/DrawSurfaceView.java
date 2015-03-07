@@ -33,6 +33,7 @@ public class DrawSurfaceView extends View {
 	Bitmap spot;
 	static ArrayList<Point> props = new ArrayList<Point>();
 	boolean check_pic;
+	int x_accel;
 	
 	Bitmap[] ic_coffee,ic_parking,ic_food,ic_7,ic_health,ic_atm;
 	int c =0,a_parking=0,a_coffee=0,a_food=0,a_7=0,a_health=0,a_atm=0;
@@ -53,13 +54,13 @@ public class DrawSurfaceView extends View {
 	public DrawSurfaceView(Context context, AttributeSet set) {
 		super(context, set);
 		//Log.e("invalidate", "start draw");
-		mPaint.setColor(Color.DKGRAY);
+		mPaint.setColor(Color.CYAN);
         mPaint.setStyle(Style.FILL);
         mPaint.setAlpha(100);
         tPaint.setColor(Color.WHITE);
         tPaint.setTextSize(40);
         
-        mPaint2.setColor(Color.DKGRAY);
+        mPaint2.setColor(Color.CYAN);
         mPaint2.setStyle(Style.FILL);
         mPaint2.setAlpha(100);
         tPaint2.setColor(Color.WHITE);
@@ -174,7 +175,7 @@ public class DrawSurfaceView extends View {
 			    	}else{
 			    		check_pic=false;
 			    	}
-			    if (distance<50){ 	
+			    if (distance<50 && x_accel>8){ 	
 			    	Log.e("name", "<50");
 				    if (spot == null)
 				        continue;
@@ -274,6 +275,12 @@ public class DrawSurfaceView extends View {
 			}
 		}
 		
+	}
+	
+	public void getAcc(int x_acc) {
+		//Log.e("invalidate", "setoffset");
+		this.x_accel = x_acc;
+		Log.e("acc_draw", String.format("%d", x_accel));
 	}
 	
 	public void setOffset(float offset) {

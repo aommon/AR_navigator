@@ -188,4 +188,23 @@
          android:layout_centerHorizontal="true"
          android:layout_centerVertical="true" />
 
+     <Button
+         android:id="@+id/btn_showpictarget"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true"
+         android:layout_alignParentLeft="true"
+          android:textColor="#FFBF00"
+          android:visibility="gone"
+         android:text="Show Target Image" />
+
+     <ImageView
+         android:id="@+id/img_target"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_centerHorizontal="true"
+         android:layout_centerVertical="true"
+         android:alpha="0.9"
+         />
+
 </RelativeLayout>

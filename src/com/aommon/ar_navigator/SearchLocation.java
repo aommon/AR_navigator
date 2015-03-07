@@ -48,7 +48,7 @@ public class SearchLocation  extends Activity {
 					int position, long id) {
 				// TODO Auto-generated method stub
 				Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-				r_name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+				r_name = cursor.getString(cursor.getColumnIndexOrThrow(Database.COL_DISPLAY_NAME));
 				double r_lat = cursor.getDouble(cursor.getColumnIndex("latitude"));
                 double r_long = cursor.getDouble(cursor.getColumnIndex("longitude"));
                 final Intent i = new Intent(getApplicationContext(),MainActivity.class);

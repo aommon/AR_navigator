@@ -12,6 +12,7 @@ import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallback
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.internal.ln;
+import com.google.android.gms.internal.ms;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -70,8 +71,8 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     
     //TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin,txtCheck;
     TextView textWarn,txtCheck;
-    ImageView imgArr;
-    Button btnSearch;
+    ImageView imgArr,img_target;
+    Button btnSearch,btn_showpictarget;
     ImageButton btn_imageType;
     private float currentDegree = 0f;
     float x;
@@ -128,9 +129,10 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         
         txtCheck = (TextView) findViewById(R.id.txtCheck);
         textWarn = (TextView) findViewById(R.id.textWarn);
-        
+        img_target=(ImageView) findViewById(R.id.img_target);
         imgArr = (ImageView)findViewById(R.id.imgArr);
         btnSearch = (Button) findViewById(R.id.b_search);
+        btn_showpictarget =(Button) findViewById(R.id.btn_showpictarget);
         btn_imageType = (ImageButton)  findViewById(R.id.btn_imageType);
         mDrawView = (DrawSurfaceView) findViewById(R.id.view);
         
@@ -175,33 +177,28 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				Log.e(TAG,"start : "+startPosition);
 				Log.e(TAG,"end : "+endPosition);
 			//	Log.e(TAG, dMode);
-//				try{
-					md.request(startPosition
-			                , endPosition, dMode);
-					Log.e("onclick","1");
-		        
-					md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
-				        public void onResponse(String status, Document doc, GMapV2Direction gd) {
-				        	Log.e("onclick","2");
-			        		int distance = gd.getTotalDistanceValue(doc);
-			        		Log.e(TAG,"Total Distance : "+distance);
-			        		int duration = gd.getTotalDurationValue(doc);
-			        		Log.e(TAG,"Total Duration : "+duration);
-			        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
-			                arr_pos = gd.getDirection(doc);
-			    			for(int j = 0 ; j < arr_pos.size() ; j++) {
-			                    Log.e("Position " + j, arr_pos.get(j).latitude
-			                            + ", " + arr_pos.get(j).longitude);
-			    			}
-			    			getInput = true;
-			    			i = 0;
-			    			imgArr.setImageResource(R.drawable.arrow_green);	
-				        }
-					});
-/*		        }catch (Exception e) {
-		        	ShowAlertDialog.Show_Dialog(MainActivity.this, "No Internet Connection","You don't have internet connection.", false);
-		        }
-*/
+				md.request(startPosition
+		                , endPosition, dMode);
+				Log.e("onclick","1");
+	        
+				md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
+			        public void onResponse(String status, Document doc, GMapV2Direction gd) {
+			        	Log.e("onclick","2");
+		        		int distance = gd.getTotalDistanceValue(doc);
+		        		Log.e(TAG,"Total Distance : "+distance);
+		        		int duration = gd.getTotalDurationValue(doc);
+		        		Log.e(TAG,"Total Duration : "+duration);
+		        		//txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+		                arr_pos = gd.getDirection(doc);
+		    			for(int j = 0 ; j < arr_pos.size() ; j++) {
+		                    Log.e("Position " + j, arr_pos.get(j).latitude
+		                            + ", " + arr_pos.get(j).longitude);
+		    			}
+		    			getInput = true;
+		    			i = 0;
+		    			imgArr.setImageResource(R.drawable.arrow_green);	
+			        }
+				});
 				click =true;
 				btn_imageType.setVisibility(View.VISIBLE);
 				//Log.e(TAG, dMode);
@@ -210,6 +207,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				}else{
 					btn_imageType.setImageResource(R.drawable.icon_walking2);
 				}
+				btn_showpictarget.setVisibility(View.VISIBLE);
 			}
 		}
 	}
@@ -235,7 +233,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				        		Log.e(TAG,"Total Distance : "+distance);
 				        		int duration = gd.getTotalDurationValue(doc);
 				        		Log.e(TAG,"Total Duration : "+duration);
-				        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+				        		//txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 				                arr_pos = gd.getDirection(doc);
 				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 				                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -262,7 +260,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				        		Log.e(TAG,"Total Distance : "+distance);
 				        		int duration = gd.getTotalDurationValue(doc);
 				        		Log.e(TAG,"Total Duration : "+duration);
-				        		txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
+				        		//txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 				                arr_pos = gd.getDirection(doc);
 				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 				                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -275,9 +273,26 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 						});
 					
 					}					
-					c++;
+					c++;					
 				}
 			});
+			btn_showpictarget.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					img_target.setVisibility(View.VISIBLE);
+					double pic_tar = (dlat - 13)*10000000;
+					String name_img_target = "a" + String.format("%.0f", pic_tar);
+					int id_img_target = Get_ID_image.getDrawable(getApplicationContext(), name_img_target);
+					img_target.setImageResource(id_img_target);
+				}
+			});
+			mPreview.setOnClickListener(new OnClickListener() {
+	            public void onClick(View v) {
+	            	img_target.setVisibility(View.INVISIBLE);
+	            }
+	        });
 		}
 		
 		if(send_data_first){
@@ -321,7 +336,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
 					getInput = false;	
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
-					txtCheck.setText("");
+					//txtCheck.setText("");
 					imgArr.setImageBitmap(null);
 					dName = "";
 				}
@@ -344,9 +359,9 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 		
         if(x<8.0){
     		//Toast.makeText(MainActivity.this, "XXXXXX", Toast.LENGTH_SHORT).show();
-        	textWarn.setText("Warning!");
+        	//textWarn.setText("Warning!");
     	}else {
-    		textWarn.setText("");
+    		//textWarn.setText("");
     	}
         
 	}
@@ -424,6 +439,8 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
             //acc
             x = event.values[0];
+            mDrawView.getAcc((int) x);
+            Log.e("acc_main", String.format("%d", (int)x));
         	//compass
         	mGravity = event.values;
         }
