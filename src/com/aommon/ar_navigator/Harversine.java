@@ -3,11 +3,13 @@ package com.aommon.ar_navigator;
 public class Harversine {
 	public static double haversine(double s_lat, double s_long, double d_lat, double d_long) {
 		int earth_radius = 6371000; //m
-		s_lat = Math.toRadians(s_lat);
-		d_lat = Math.toRadians(d_lat);
+		//s_lat = deg2rad(s_lat);
+		//d_lat = deg2rad(d_lat);
 		double diff_latitude = d_lat-s_lat;
 		double diff_latitude_rad = Math.toRadians(diff_latitude);
 		
+		//s_long = deg2rad(s_long);
+		//d_long = deg2rad(d_long);
 		double diff_longitude = d_long-s_long;
 		double diff_longitude_rad = Math.toRadians(diff_longitude);
 		

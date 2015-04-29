@@ -35,10 +35,11 @@ public class DrawSurfaceView extends View {
 	boolean check_pic;
 	int x_accel;
 	
-	Bitmap[] ic_coffee,ic_parking,ic_food,ic_7,ic_health,ic_atm;
-	int c =0,a_parking=0,a_coffee=0,a_food=0,a_7=0,a_health=0,a_atm=0;
+	Bitmap[] ic_coffee,ic_parking,ic_food,ic_7,ic_health,ic_atm,ic_copier;
+	int c =0,a_parking=0,a_coffee=0,a_food=0,a_7=0,a_health=0,a_atm=0,a_copier=0;
+	
 	//แก้ไขตรงนี้นะค่ะเพิ่ม size
-	int size=25,size_parking=2,size_coffee=5,size_food=2,size_7=1,size_health=2,size_atm=1; 
+	int size=204,size_parking=26,size_coffee=22,size_food=13,size_7=3,size_health=1,size_atm=8,size_copier=5; 
 	
 
 	public void getnear_lacation(ArrayList<Point> prop){
@@ -72,9 +73,17 @@ public class DrawSurfaceView extends View {
         at_tPaint.setColor(Color.WHITE);
         at_tPaint.setTextSize(40);
 		
+        
+        //copier
+        ic_copier = new Bitmap[size_copier];
+		Log.e("mSpots-size_copier", String.format("%d", ic_copier.length));
+		for (int i = 0; i < ic_copier.length; i++) {
+			ic_copier[i] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_copier);
+		}
+		a_copier=0;
         //coffee
         ic_coffee = new Bitmap[size_coffee];
-		Log.e("mSpots-size", String.format("%d", ic_coffee.length));
+		Log.e("mSpots-size_coffee", String.format("%d", ic_coffee.length));
 		for (int i = 0; i < ic_coffee.length; i++) {
 			ic_coffee[i] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_coffee);
 		}
@@ -125,20 +134,20 @@ public class DrawSurfaceView extends View {
 			for (int i = 0; i < size; i++) {
 				
 			    Point u = props.get(i);
-			    name = MainActivity.send_choose_name();
+			    name = MainActivity.send_choose_name(); //display_name
 			    //Log.e("send_name", ""+name);
 
 			    double distance = Harversine.haversine(me.latitude, me.longitude, u.latitude, u.longitude);
 			    Log.e("name", u.description);
-			    //Log.e("distance", String.format("%.8f", distance));
+			    Log.e("distance", String.format("%.8f", distance));
 			    
 			    	
-			    	Log.e("aom", String.format("%d", a_coffee));
-			    	Log.e("aom_i", String.format("%d", i));
+			    	//Log.e("aom", String.format("%d", a_coffee));
+			    	//Log.e("aom_i", String.format("%d", i));
 			    	if(u.description .equals("coffee shop")){
 			    		spot = ic_coffee[a_coffee];
 			    		a_coffee++;
-			    		Log.e("err", String.format("%d", a_coffee));
+			    		//Log.e("err", String.format("%d", a_coffee));
 			    		if(a_coffee==size_coffee)
 			    			a_coffee=0;
 			    		check_pic=true;
@@ -171,6 +180,12 @@ public class DrawSurfaceView extends View {
 			    		a_atm++;
 			    		if(a_atm==size_atm)
 			    			a_atm=0;
+			    		check_pic=true;
+			    	}else if(u.description .equals("ร้านถ่ายเอกสาร")){
+			    		spot = ic_copier[a_copier];
+			    		a_copier++;
+			    		if(a_copier==size_copier)
+			    			a_copier=0;
 			    		check_pic=true;
 			    	}else{
 			    		check_pic=false;
@@ -207,7 +222,7 @@ public class DrawSurfaceView extends View {
 				    Log.e("xPos_xPo", String.format("%.2f", xPos));
 				    Log.e("xPos_ux", String.format("%.2f", u.x));
 			    
-			    
+				    //set position left right
 			    	if(u.description .equals(name)){				    	
 			            left = (u.x-20)-at_tPaint.measureText(u.description)/2;
 			            right = (u.x+20) + at_tPaint.measureText(u.description)/2;
@@ -215,8 +230,7 @@ public class DrawSurfaceView extends View {
 				    	
 			            left = (u.x-20)-tPaint.measureText(u.description)/2;
 			            right = (u.x+20) + tPaint.measureText(u.description)/2;
-				    }else{
-				    	
+				    }else{				    	
 			            left = (u.x-20)-tPaint2.measureText(u.description)/2;
 			            right = (u.x+20) + tPaint2.measureText(u.description)/2;
 				    }
@@ -271,6 +285,11 @@ public class DrawSurfaceView extends View {
 					    if(check_pic)
 					    	canvas.drawBitmap(spot, u.x, u.y, tPaint2);
 				    }
+			    	
+			    	Log.e("draw", u.description);
+			    	Log.e("draw-x", String.format("%.2f", u.x));
+			    	Log.e("draw-y", String.format("%.2f", u.y));
+			    	
 			    }
 			}
 		}
