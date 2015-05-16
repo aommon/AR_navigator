@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+//This class check that you connected the internet.
 public class check_internet {
 	private Context _context;
     

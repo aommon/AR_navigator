@@ -69,7 +69,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
     float[] mGravity;
     float[] mGeomagnetic;
     
-    //TextView txtHeading,textInf,txtSoLat,txtSoLng,txtBetlat,txtBetlng,txtDesLat,txtDesLng,txtAngle,txtI,txtEnd,txtFin,txtCheck;
     TextView textWarn,txtCheck;
     ImageView imgArr,img_target;
     Button btnSearch,btn_showpictarget;
@@ -145,6 +144,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         	finish();
         }  
         
+        //Check Your Internet Connection For Search Location
         cd = new check_internet(getApplicationContext());
         isInternetPresent = cd.isConnectingToInternet();
 		if(isInternetPresent){
@@ -158,9 +158,10 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 		} else {
 			Toast.makeText(getApplicationContext(), "Please connect your INTERNET!!", Toast.LENGTH_LONG).show();
 		}
-		send_data_first=true;
+		send_data_first=true; //bool for send data first
 	}
 	
+	// Receive Data From Google Maps
 	protected void onActivityResult ( int requestCode, int resultCode, Intent data )
 	{
 		if(requestCode == 999)
@@ -170,25 +171,13 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				dlat = data.getDoubleExtra("mydLat", lat);
 				dlng = data.getDoubleExtra("mydLong", lng);
 				dMode = data.getStringExtra("mydMode");
-				Log.e(TAG, "Destination : " + dName + " " + dlat + "," + dlng);
 				btnSearch.setText(dName);
 				LatLng startPosition = new LatLng(lat, lng);
 				LatLng endPosition = new LatLng(dlat , dlng);
-				Log.e(TAG,"start : "+startPosition);
-				Log.e(TAG,"end : "+endPosition);
-			//	Log.e(TAG, dMode);
 				md.request(startPosition
 		                , endPosition, dMode);
-				Log.e("onclick","1");
-	        
 				md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
 			        public void onResponse(String status, Document doc, GMapV2Direction gd) {
-			        	Log.e("onclick","2");
-		        		int distance = gd.getTotalDistanceValue(doc);
-		        		Log.e(TAG,"Total Distance : "+distance);
-		        		int duration = gd.getTotalDurationValue(doc);
-		        		Log.e(TAG,"Total Duration : "+duration);
-		        		//txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 		                arr_pos = gd.getDirection(doc);
 		    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 		                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -201,7 +190,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 				});
 				click =true;
 				btn_imageType.setVisibility(View.VISIBLE);
-				//Log.e(TAG, dMode);
 				if(dMode .equals("driving")){
 					btn_imageType.setImageResource(R.drawable.icon_driving);
 				}else{
@@ -215,6 +203,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 	public void workspace(){
 		
 		if(click){
+			//Set pic of image type and requested new data route from Google Maps
 			btn_imageType.setOnClickListener(new OnClickListener() {			
 				public void onClick(View v) {
 					if(c%2 == 1){
@@ -224,16 +213,8 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 						LatLng endPosition = new LatLng(dlat , dlng);
 						md.request(startPosition
 				                , endPosition, GMapV2Direction.MODE_DRIVING);
-						Log.e("onclick","1");
-			        
 						md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
 					        public void onResponse(String status, Document doc, GMapV2Direction gd) {
-					        	Log.e("onclick","2");
-				        		int distance = gd.getTotalDistanceValue(doc);
-				        		Log.e(TAG,"Total Distance : "+distance);
-				        		int duration = gd.getTotalDurationValue(doc);
-				        		Log.e(TAG,"Total Duration : "+duration);
-				        		//txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 				                arr_pos = gd.getDirection(doc);
 				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 				                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -255,12 +236,6 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 			        
 						md.setOnDirectionResponseListener(new OnDirectionResponseListener() {
 					        public void onResponse(String status, Document doc, GMapV2Direction gd) {
-					        	Log.e("onclick","2");
-				        		int distance = gd.getTotalDistanceValue(doc);
-				        		Log.e(TAG,"Total Distance : "+distance);
-				        		int duration = gd.getTotalDurationValue(doc);
-				        		Log.e(TAG,"Total Duration : "+duration);
-				        		//txtCheck.setText("Total Distance : " + distance + " m\n"+"Duration : " + duration + " sec");
 				                arr_pos = gd.getDirection(doc);
 				    			for(int j = 0 ; j < arr_pos.size() ; j++) {
 				                    Log.e("Position " + j, arr_pos.get(j).latitude
@@ -276,8 +251,9 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 					c++;					
 				}
 			});
-			btn_showpictarget.setOnClickListener(new OnClickListener() {
-				
+			
+			//Calculate for Show Image Target
+			btn_showpictarget.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
@@ -288,6 +264,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 					img_target.setImageResource(id_img_target);
 				}
 			});
+			//Invisible Image Target
 			mPreview.setOnClickListener(new OnClickListener() {
 	            public void onClick(View v) {
 	            	img_target.setVisibility(View.INVISIBLE);
@@ -295,75 +272,57 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 	        });
 		}
 		
-		if(send_data_first){
-	    	//send all to canvas
+		//retrieve all data from SQLite and sent to DrawSurfaceView.java (send only one time)
+		if(send_data_first){	    	
 			if (lat != 0 && lng != 0){
-				Log.e("check", "2");
 				mCursor_near = mDb.rawQuery("SELECT  " +  Database.COL_DISPLAY_NAME  + "," + Database.COL_LATITUDE + "," + 
 	        		Database.COL_LONGITUDE  + " FROM " + Database.TABLE_NAME , null);
-
 			   	mCursor_near.moveToFirst();
 		        if(mCursor_near.moveToFirst()){
 		        	props.clear();
-		        	//Log.e("check2", String.format("%d", mCursor_near.getCount()));
 		        	do{	        	
 		        		double latitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LATITUDE));
 		        		double longitude = mCursor_near.getDouble(mCursor_near.getColumnIndex(Database.COL_LONGITUDE));
 		        		String name = mCursor_near.getString(mCursor_near.getColumnIndex(Database.COL_DISPLAY_NAME));	        		
-		        		//Log.e("check3", String.format("%.8f", longitude));
-		        		//Log.e("check4", name);
 			        	props.add(new Point(latitude, longitude, name));
 		        	} while (mCursor_near.moveToNext());
-		        	//Log.e("end", "end");
-		        	 mDrawView.getnear_lacation(props);
-		        	//Log.e("invalidate", "call-mm");
+		        	mDrawView.getnear_lacation(props);
 		        	mDrawView.invalidate();
 		        }
 		        send_data_first=false;
 			}
 		}
 
-		if(getInput){			
-			Log.e("onclick","3");		
-			
+		//Destination checked 
+		if(getInput){		
+			//Check Present's Point near Destination's Point less than 10 m.
 			near_target = nearby.nearbyLaLong(dlat, dlng, 10);
 			if(lat > near_target[2].x && lat < near_target[0].x && lng < near_target[1].y && lng > near_target[3].y ){
-				//Check LatLng Nearest
+				//rotate arrow to point to Destination
 				double t_angle = Azimuth.initial(lat, lng, dlat, dlng);
 				old_rotate = Navigator.Rotate_arrow(azimuthInDegress, t_angle, old_rotate, imgArr);
-				//Check LatLng At Destination
+				//Check Present's Point near Destination's Point less than 7 m.
 				at_target = nearby.nearbyLaLong(dlat, dlng,7);
 				if(lat > at_target[2].x && lat < at_target[0].x && lng < at_target[1].y && lng > at_target[3].y ){
 					getInput = false;	
 					Toast.makeText(getApplicationContext(), "Reached Destination", Toast.LENGTH_LONG).show();
-					//txtCheck.setText("");
 					imgArr.setImageBitmap(null);
 					dName = "";
 				}
 			} else {
-				//Check LatLng by Route
-				double be_lat = arr_pos.get(i).latitude;
-	        	double be_lng = arr_pos.get(i).longitude;
+				
+				double be_lat = arr_pos.get(i).latitude; //Latitude from Routed By Google Map
+	        	double be_lng = arr_pos.get(i).longitude; //Longitude from Routed By Google Map
 	        	a = nearby.nearbyLaLong(be_lat, be_lng,7);
+	        	//Check Present's Point near THIS Routed Google Maps's point OR NEXT Routed Google Maps's point
 				if(lat > a[2].x && lat < a[0].x && lng < a[1].y && lng > a[3].y ){
-					Log.e("i+new",""+i);
 					i++;
 	         	}else{
 	        		angle = Azimuth.initial(lat, lng, be_lat, be_lng);
 	                old_rotate = Navigator.Rotate_arrow(azimuthInDegress, angle, old_rotate, imgArr);
 	        	}
 			}
-		}
-		//Log.e("invalidate", "call-workspace");
-		//mDrawView.invalidate();
-		
-        if(x<8.0){
-    		//Toast.makeText(MainActivity.this, "XXXXXX", Toast.LENGTH_SHORT).show();
-        	//textWarn.setText("Warning!");
-    	}else {
-    		//textWarn.setText("");
-    	}
-        
+		}     
 	}
 	
 	 public void onResume() {
@@ -437,7 +396,7 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 	public void onSensorChanged(SensorEvent event) {
 		//compass
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            //acc
+            //Accelerometer
             x = event.values[0];
             mDrawView.getAcc((int) x);
             Log.e("acc_main", String.format("%d", (int)x));
@@ -464,22 +423,22 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
         x1=x2;
         x2=azimuthInDegress;
         if(x2 > x1+1 || x2 < x1-1){
-        	true_deg = nearby.true_compass(x2);
+        	true_deg = nearby.true_compass(x2); //true degree
         }
-        
+        //Send True Degree to DrawSurfaceView.java
     	if (mDrawView != null) {
 			mDrawView.setOffset(true_deg);
-			Log.e("invalidate", "call-sensor");
 			mDrawView.invalidate();
 		}
-    	//Log.e("x_draw", "draw")
         workspace();
 	}
+    
+    
+    
     
   //GPS
     private ConnectionCallbacks mCallback = new ConnectionCallbacks() {
         public void onConnected(Bundle bundle) {
-        	//Toast.makeText(MainActivity.this, "Services connected", Toast.LENGTH_SHORT).show();
             LocationRequest mRequest = new LocationRequest()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                     .setInterval(5000).setFastestInterval(1000);
@@ -505,11 +464,9 @@ public class MainActivity<CustomView> extends Activity implements SurfaceHolder.
 
     LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
-        	//LatLng coordinate = new LatLng(location.getLatitude(),location.getLongitude());
         	lat = location.getLatitude();
         	lng = location.getLongitude();
         	mDrawView.setMyLocation(location.getLatitude(), location.getLongitude());
-        	//Log.e("invalidate", "call-location");
 			mDrawView.invalidate();
         	workspace();         
 		}       

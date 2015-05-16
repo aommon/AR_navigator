@@ -6,12 +6,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
 
+//This Class is Splash Sheet.
 public class Splash extends Activity {
 
     Handler handler;
     Runnable runnable;
     long delay_time;
-    long time = 3000L;
+    long time = 3000L; // wait 3 second
     
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

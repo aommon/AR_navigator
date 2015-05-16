@@ -1,5 +1,6 @@
 package com.aommon.ar_navigator;
 
+//This Class calculate 4 points around the Present's Point.
 import java.util.Arrays;
 
 import android.database.Cursor;
@@ -36,41 +37,11 @@ public class nearby {
         return newPoint;
     }
 	
-	public static float degree_right(float deg){ //more than
-		float right = deg-31+90;//deg+60 deg-120
-		if(right>360){
-        	right = right-360;
-        }else if(right<0){
-        	right = 360+right;
-        }
-        return right;
-	}
-	
-	public static float degree_left(float deg){ //less than
-		float left = deg+31+90;//deg+120 //deg-60
-        if(left>360){
-        	left = left-360;
-        }else if(left<0){
-        	left = 360+left;
-        }
-        return left;
-	}
-	
-	public static float true_compass(float deg){ //True degree when watching AR
-		float t_de = deg+90;
-        if(t_de>360){
-        	t_de = t_de-360;
-        }else if(t_de<0){
-        	t_de = 360+t_de;
-        }
-        return t_de;
-	}
 	
 	public static PointF[] nearbyLaLong (double s_la, double s_long,int distance){
 		//nearby
         PointF center = new PointF((float)s_la, (float)s_long);
         final double mult = 1.1; // mult = 1.1; is more reliable
-        //double distance = 50;
         
         PointF p1 = nearby.calculateDerivedPosition(center, mult * distance, 0); //right
         PointF p2 = nearby.calculateDerivedPosition(center, mult * distance, 90); //forward
@@ -85,14 +56,15 @@ public class nearby {
         return p;
 	}
 	
-	public static boolean pointIsInCircle(double center_la, double center_long ,double des_la , double des_long, double radius) {
-        if (Harversine.haversine(center_la, center_long, des_la, des_long) < radius)
-            return true;
-        else
-            return false;
-    }
-	
-	
-	
+	//True degree when watching AR
+	public static float true_compass(float deg){ 
+		float t_de = deg+90;
+        if(t_de>360){
+        	t_de = t_de-360;
+        }else if(t_de<0){
+        	t_de = 360+t_de;
+        }
+        return t_de;
+	}
 
 }
